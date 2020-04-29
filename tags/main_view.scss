@@ -1,0 +1,15 @@
+#mainview {
+    display: grid;
+    grid-template-rows: 3rem 1fr;
+    height: 100vh;
+
+    &.hidden {
+        display: none;
+    }
+}
+
+#main_contents {
+    contain: strict;
+    position: relative;
+    min-height: 0;
+}

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,max-scale=1,user-scalable=no">
+<meta name="description" content="Notestand is a PDF musical score viewer based on Google Drive. Use this to manage and browse PDF musical score files.">
+<meta property="og:url" content="https://notestand.bearwapps.com" /> 
+<meta property="og:title" content="Notestand" /> 
+<meta property="og:type" content="website" /> 
+<meta property="og:image" content="https://notestand.bearwapps.com/image/hero_music_score.jpg" /> 
+<meta property="og:description" content="Notestand is a PDF musical score viewer based on Google Drive. Use this to manage and browse PDF musical score files." /> 
+<meta name="twitter:card" content="summary" /> 
+<link rel="prerender" href="https://notestand.bearwapps.com/app/">
+<link rel="alternate" href="https://notestand.bearwapps.com/index-ja.html" hreflang="ja">
+<link rel="alternate" href="https://notestand.bearwapps.com" hreflang="x-default">
+<title>Notestand</title>
+<style>
+    :root {
+        --color-accent: hsl(18, 82%, 60%);
+    }
+    body {
+        margin: 0;
+        font-family: sans-serif;
+        line-height: 1.6;
+        color: #4a4a4a;
+    }
+
+    #hero {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: calc(100vh - 12rem);
+        background-image: url('/image/hero_music_score.jpg');
+        background-position: center;
+        background-size: cover;
+        background-attachment: fixed;
+        color: white;
+        text-shadow: 0 0 12px black, 0 0 4px black;
+    }
+
+    #hero a {
+        color: #ddf;
+    }
+
+    #title {
+        text-align: center;
+        line-height: 1;
+        letter-spacing: 0.2rem;
+        font-size: 3rem;
+        padding: 0 1rem;
+        margin: 0;
+    }
+
+    #hero > p {
+        text-align: center;
+        margin-right: 1rem;
+        margin-left: 1rem;
+        font-size: 1.2rem;
+        max-width: 36rem;
+    }
+
+    a.start_app {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        color: white !important;
+        background-color: var(--color-accent);
+        border: 2px solid var(--color-accent);
+        display: block;
+        text-align: center;
+        font-size: 1.4rem;
+        text-decoration: none;
+        margin: 2rem auto;
+        line-height: 1;
+        padding: 1.5rem 1.2rem;
+        width: 24rem;
+        max-width: calc(100vw - 2rem);
+        box-sizing: border-box;
+        letter-spacing: 0.1rem;
+        font-weight: bold;
+        text-shadow: none;
+    }
+
+    .start_app:hover {
+        background-color: var(--color-accent);
+        border-color: white;
+    }
+
+    section.text.lang-switch {
+        text-align: center;
+    }
+
+    section.text {
+        width: calc(100% - 2rem);
+        max-width: 40rem;
+        margin: 4rem auto;
+        text-align: start;
+        font-size: 1.2rem;
+    }
+
+    section.text > h2 {
+        font-size: 2rem;
+    }
+
+    ol, ul {
+        padding-left: 1.5rem;
+    }
+
+    li {
+        margin: .5rem 0;
+    }
+
+    address {
+        font-style: normal;
+    }
+</style>
+</head>
+<body>
+    <section id="hero">
+        <h1 id="title">Notestand</h1>
+        <p>A PDF musical score viewer based on <a href="https://drive.google.com/" target="_blank" rel=noopener>Google Drive</a>.</p>
+        <a href="./app/" class="start_app">Go to Notestand</a>
+    </section>
+    <section class="text lang-switch">
+        <a href="/index-ja.html">日本語ページ(in Japanese)</a>
+    </section>
+    <section class="text">
+        <h2>Feature</h2>
+        <ol>
+            <li>Specialized for browsing PDF sheet music</li>
+            <li>A folder treated as an "Album" of some sheets of music</li>
+            <li>Tabs and gesture UI convenient for playing a sequence of music</li>
+        </ol>
+    </section>
+    <section class="text">
+        <h2>How to Use</h2>
+        <ol>
+            <li>You can pick one folder of <a href="https://drive.google.com/" target="_blank" rel=noopener>Google Drive</a>, and 
+                open it as an album.</li>
+            <li>You can see the list of PDF files in that album.</li>
+            <li>You can open one of them and I show it in the way you can treat it as a musical score.</li>
+        </ol>
+    </section>
+    <a href="./app/" class="start_app">Go to Notestand</a>
+    <section class="text">
+        <h2 id="anc_privacy_policy">Privacy Policy</h2>
+        <p>
+            Notestand doesn't store or send your profile for any reasons but those written below.
+            <ul>
+                <li>To show account information in the user interface.</li>
+                <li>To access Google Drive API.</li>
+            </ul>
+        </p>
+    </section>
+    <section class="text">
+            <h2 id="anc_contact">Contact</h2>
+            <address><p>honey32 e-mail📧: <a href="mailto:honey32apps@gmail.com">honey32apps@gmail.com</a></p></address>
+            <p><a href="https://www.bearwapps.com/" target="_blank">Web Site (Other apps from here)</a></p>
+    </section>
+    <script type="text/javascript">
+        var nend_params = {"media":52807,"site":289529,"spot":845230,"type":1,"oriented":1};
+    </script>
+    <script type="text/javascript" src="https://js1.nend.net/js/nendAdLoader.js"></script>
+</body>
+</html>

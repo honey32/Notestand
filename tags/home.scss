@@ -1,0 +1,47 @@
+@import './home/account_info.scss';
+@import './home/album_list.scss';
+@import './home/language_select.scss';
+@import './home/nend_ad.scss';
+@import './home/new_album.scss';
+
+#home {
+    &.hidden {
+        display: none;
+    }
+    min-height: 100vh;
+
+    @media screen and (min-width: 40rem) {
+        background-color: rgba(0,0,0, .01);
+    }
+}
+
+#home_heading {
+    display: flex;
+    align-items: baseline;
+
+    &_text {
+        font-size: 1.4rem;
+        padding: 1rem;
+        font-weight: bold;
+        flex-grow: 1;
+        flex-shrink: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    & #account_info {
+        flex-grow: 0;
+    }
+
+    @media screen and (min-width: 40rem) {
+        &_text {
+            font-size: 1.6rem;
+        }
+    }
+}
+
+#link_to_about_wrapper {
+    text-align: center;
+    margin: 1rem 0;
+}

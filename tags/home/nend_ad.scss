@@ -1,0 +1,31 @@
+.nend_ad {
+    border-top: 1px solid #aaa;
+    border-bottom: 1px solid #aaa;
+    padding: 0.5rem;
+    margin: 0.5rem;
+    
+    &_def {
+        display: inline-block;
+        background-color: #555;
+        color: #ddd;
+        padding: 0.3rem;
+        border-radius: 2px;
+    }
+
+    &_head {
+        display: block;
+        text-decoration: none;
+
+        &_line {
+            text-decoration: underline;
+        }
+    
+        &_url {
+            color: #777;
+        }
+    }
+    
+    &_body {
+        color: #666;
+    }
+}

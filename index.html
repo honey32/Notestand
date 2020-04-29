@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-113931778-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-113931778-1');
+
+  window.addEventListener('error', function (e) {
+      gtag('event', 'exception', { description: e.error, fatal: false});
+  });
+</script>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,max-scale=1,user-scalable=no">
+<link rel="stylesheet" href="./tags/app.scss">
+<link rel="manifest" href="./notestand.webmanifest">
+<title>Notestand</title>
+<style>
+    body {
+        margin: 0;
+        font-family: sans-serif;
+    }
+
+    * {
+        cursor: default;
+        user-select: none;
+    }
+</style>
+</head>
+<body>
+    <div id="home">
+        <div id="home_heading"></div>
+        <div id="container_albums"></div>
+        <script id="script_nend_params"  type="text/javascript">
+            var nend_params = {"media":52807,"site":289529,"spot":845236,"type":10,"oriented":1};
+        </script>
+        <script id="script_nend_ad_loader" type="text/javascript" src="https://js1.nend.net/js/nendAdLoader.js"></script>
+    </div>
+<script>if (!Symbol['asyncIterator']) { Symbol['asyncIterator'] = Symbol() }</script>
+<script src="./scripts/r_main.ts"></script>
+<script src="https://apis.google.com/js/api.js?onload=checkAuth"></script>
+</body>
+</html>

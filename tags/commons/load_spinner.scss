@@ -1,0 +1,46 @@
+.loading_spinner {
+    position: fixed;
+    width: 40px;
+    height: 40px;
+    top: calc(50vh - 20px);
+    left: calc(50vw - 20px);
+    border-radius: 20px;
+    animation: spin 2s ease-in-out infinite;
+
+    &_dot {
+        height: 8px;
+        width: 8px;
+        border-radius: 4px;
+        position: absolute;
+        top: 16px;
+        left: 16px;
+        background-color: currentColor;
+        opacity: 0.4;
+
+        &:nth-child(1) {
+            top: 6px;
+            left: 16px;
+        }
+
+        &:nth-child(2) {
+            top: 16px;
+            left: 6px;
+        }
+
+        &:nth-child(3) {
+            top: 26px;
+            left: 16px;
+        }
+
+        &:nth-child(4) {
+            top: 16px;
+            left: 26px;
+        }
+    }
+}
+
+@keyframes spin {
+    0%   { transform: scale(1) rotate(0deg); }
+    50%  { transform: scale(2) rotate(180deg); }
+    100% { transform: scale(1) rotate(360deg); }
+}

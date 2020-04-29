@@ -1,0 +1,26 @@
+.toast_wrapper {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    padding: 2rem;
+
+    .toast {
+        background-color: rgba(0,0,0, .6);
+        color: var(--color-bg);
+        @include on-dark-theme {
+            background-color: rgba(255,255,255, .6);
+        }
+
+        box-shadow: 0 1px 8px hsla(0,0,0, 0.2);
+        
+        padding: 1rem;
+        border-radius: 2px;
+        box-sizing: border-box;
+
+        transition: 500ms 0ms ease-in-out;
+        transform: translate(0, 0);
+        &.hidden {
+            transform: translate(100vw, 0);
+        }
+    }
+}

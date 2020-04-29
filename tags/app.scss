@@ -1,0 +1,47 @@
+body {
+    color: #333;
+    font-family: sans-serif;
+    --color-text-hint: rgba(0,0,0, 0.5);
+    --color-accent: hsl(18, 82%, 60%);
+    --color-bg: white;
+    --color-bg-popup: var(--color-bg);
+    --color-bg-hover: #f6f6f6;
+    --color-ripple: #ddd;
+    background-color: var(--color-bg);
+
+    &[data-uitheme="dark"] {
+        --color-text-hint: rgba(255,255,255, 0.5);
+        --color-accent: hsl(18, 82%, 50%);
+        --color-bg: #1a1a1a;
+        --color-bg-popup: #222;
+        --color-bg-hover: #2a2a2a;
+        --color-ripple: #333;
+        color: #ddd;
+    }
+}
+
+@mixin on-dark-theme {
+    body[data-uitheme="dark"] & {
+        @content;
+    }
+}
+
+a:any-link, a:-webkit-any-link {
+    @include on-dark-theme {
+        color: hsl(240, 90%, 80%);
+    }
+}
+
+
+
+@import "./commons/commons.scss";
+@import "./commons/toast.scss";
+@import "./icon/icon.scss";
+
+@import "./home.scss";
+@import "./main_view.scss";
+@import "./tabbar.scss";
+@import "./menubar.scss";
+@import "./tab_list.scss";
+@import "./tune_list.scss";
+@import "./score.scss";

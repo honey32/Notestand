@@ -1,0 +1,74 @@
+@import "./ripple.scss";
+@import "./load_spinner.scss";
+
+@mixin fill-parent($top: 0, $right: 0, $bottom: 0, $left: 0) {
+    position: absolute;
+    top: $top;
+    right: $right;
+    bottom: $bottom;
+    left: $left;
+    min-height: 0;
+}
+
+@mixin reveal() {
+    &:hover {
+        background-color: var(--color-bg-hover);
+    }
+}
+
+@mixin card() {
+    box-shadow: 0 0 12px rgba(0,0,0, .1);
+    border-radius: 3px;
+    background-color: var(--color-bg);
+    transform: scale(1);
+    transition: transform 200ms ease-out;
+
+    &:hover {
+        box-shadow: 0 2px 16px rgba(0,0,0, .15);
+        transform: scale(1.005);
+        transition-duration: 100ms;
+    }
+}
+
+@mixin thin-scroll-bar($x: false, $y: true) {
+    @if $x {
+        overflow-x: scroll;
+    }
+
+    @if $y {
+        overflow-y: scroll;
+    }
+    
+
+    &::-webkit-scrollbar {
+        width: 4px;
+        height: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: #999;
+
+        @include on-dark-theme {
+            background-color: #666;
+        }
+
+        border-radius: 2px;
+    }
+}
+
+@mixin reset-style-button {
+    border: none;
+    background-color: transparent;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    font-size: inherit;
+    color: inherit;
+}
+
+@mixin reset-style-input {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-color: transparent;
+}

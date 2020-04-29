@@ -1,0 +1,6 @@
+@mixin rippleable() {
+    transition: 75ms background-color ease-out;
+    &.ripple-active {
+        background-color: var(--color-ripple);
+    }
+}

@@ -1,0 +1,40 @@
+$icon-size: 1.2rem;
+
+@mixin icon-wrapper {
+    width: $icon-size;
+    height: $icon-size;
+    padding: 0.9rem;
+    color: #444;
+
+    @include on-dark-theme {
+        color: #ccc;
+    }
+}
+
+svg.icon {
+    width: $icon-size;
+    height: $icon-size;
+    stroke-width: 4px;
+}
+
+.icon.arrow {
+    stroke: currentColor;
+    stroke-linejoin: round;
+    fill: none;
+}
+
+.icon.hamburger {
+    stroke: currentColor;
+    stroke-linecap: round;
+}
+
+.icon.cross {
+    stroke: currentColor;
+    stroke-linecap: round;
+}
+
+.icon.tabs {
+    stroke: currentColor;
+    stroke-linecap: round;
+    fill: none;
+}

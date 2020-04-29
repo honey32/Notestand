@@ -1,0 +1,76 @@
+#account_info:not([hidden]) {
+    margin-right: 1rem;
+    display: flex;
+}
+
+#account_name {
+    padding: 1rem;
+    flex-grow: 10;
+    line-height: 1;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    &:empty {
+        display: none;
+    }
+}
+
+#account_inout_button {
+    @include reset-style-button;
+    flex-grow: 1;
+    flex-shrink: 0;
+    text-decoration: underline;
+    display: block;
+    padding: 1rem;
+    line-height: 1;
+
+    &:focus {
+        background-color: var(--color-accent-faint);
+    }
+}
+
+.signin_button_wrapper {
+    margin: 1rem;
+    
+    .signin_button {
+        @include reset-style-button;
+        display: flex;
+        margin: 2rem auto;
+        align-items: center;
+        font-size: 1.3rem;
+        color: var(--color-text-hint);
+        border-radius: 2px;
+        text-decoration: none;
+        background-color: white;
+        box-shadow: 0 0 2px rgba(0,0,0, .2), 0 2px 3px rgba(0,0,0, .1);
+
+        &:hover {
+            background-color: var(--color-bg-hover);
+        }
+
+        .signin_button_icon {
+            flex-shrink: 0;
+            height: 2rem;
+            width: 2rem;
+            padding: .5rem;
+            margin: .2rem 0;
+            background-color: white;
+        }
+
+        .signin_button_text {
+            padding: 0 2rem;
+            flex-grow: 1;
+        }
+
+        @include on-dark-theme {
+            background-color: #4285F4;
+            color: white;
+
+            &:hover {
+                background-color: #5295FF;
+            }
+        }
+    }
+}
+
