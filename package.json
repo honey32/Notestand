@@ -27,7 +27,7 @@
     "package:desktop": "pkg . --out-dir ./build",
     "clean": "rimraf ./public/app",
     "copyworker": "cpx node_modules/pdfjs-dist/build/pdf.worker.min.js public/app/",
-    "lint": "eslint tsc"
+    "lint:fix": "eslint --fix ./scripts/** ./tags/**"
   },
   "pkg": {
     "assets": "./public/**/*"
