@@ -1,9 +1,9 @@
-declare module "page" {
+declare module 'page' {
     interface Context<KEYS extends string> {
         params: { [K in KEYS] : string }
     }
-    
-    interface RouteHandler<C extends Context<any>> { 
+
+    interface RouteHandler<C extends Context<any>> {
         (ctx: C): void
     }
 
@@ -11,7 +11,7 @@ declare module "page" {
         start(): void
         <Params extends string = undefined>(route: string, handler?: RouteHandler<Context<Params>>): void
     }
-    
-    const page: PageJs
-    export default page
+
+    const page: PageJs;
+    export default page;
 }
