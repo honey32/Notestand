@@ -17,7 +17,6 @@ function useSavedAlbumName() {
   useEffect(() => {
     run(async () => {
       const nameGot = await DAO.getEntityName(currentAlbumId);
-      console.log("New Album:" + nameGot);
       setName(nameGot);
       if (await DAO.albumExists({ id: currentAlbumId })) {
         await DAO.addAlbum(new Album(nameGot, currentAlbumId));
