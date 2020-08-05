@@ -5,6 +5,8 @@ import { Tune } from "../scripts/tune";
 import { useState } from "react";
 import { Album } from "../scripts/album";
 import * as React from "react";
+import { useQueryParam } from "../scripts/state";
+import { Link, useHistory } from "react-router-dom";
 
 export const TabBar: React.FC<{ albumName: string }> = ({ albumName }) => {
   const [isTabListOpen, setTabListOpen] = useState(false);
@@ -34,6 +36,10 @@ export const TabBar: React.FC<{ albumName: string }> = ({ albumName }) => {
 };
 
 const BackButton: React.FC = () => {
+  const [q, err] = useQueryParam();
+  const h = useHistory();
+  const shouldBackToHome = err ? true : !q.has("score") || !q.has("album");
+
   function clickBack(e: React.MouseEvent<HTMLDivElement>) {
     activateRipple(e.currentTarget, () => {
       // if (state.value === "Score" && albumManager.current.album.value) {
@@ -43,7 +49,14 @@ const BackButton: React.FC = () => {
       // }
     });
   }
-  return <div className="back_home tab" onClick={clickBack}>[arrow()]</div>;
+
+  const backUrl = shouldBackToHome ? "/" : `/view?album=${q.get("album")}`;
+
+  return <div className="back_home tab">
+    <Link to={backUrl}>
+      [arrow()]
+    </Link>
+  </div>;
 };
 
 const AlbumNameTab: React.FC<{ albumName: string }> = ({ albumName }) => {
