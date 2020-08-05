@@ -26,7 +26,7 @@ export const AlbumList: React.FC = () => {
   );
 };
 
-function onclick(this: Album, e: Event) {
+function onclick(e: React.MouseEvent) {
   activateRipple(e.target as HTMLElement, () => {
     // router.openAlbum(this.id);
   });

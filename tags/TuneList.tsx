@@ -11,8 +11,14 @@ import { TabBar } from "./TabBar";
 import { loadingSpinner } from "./commons/load_spinner";
 // import { projector } from "./tags";
 import { BaseProperty, each2 } from "hojoki";
-import { useState, ReactElement } from "react";
+import { useState, ReactElement, useEffect } from "react";
 import * as React from "react";
+import { useCurrentAlbumId } from "../scripts/state";
+import { DAO } from "../scripts/dao/dao";
+import { run } from "../scripts/util/lazy";
+import { Album } from "../scripts/album";
+import { getAlbumKanjiHint, IndexedTunes } from "../scripts/search";
+import { useLocale } from "../scripts/i18n";
 
 type TuneId = string;
 const ctxmenuOpenFor = new BaseProperty<TuneId>(null);
@@ -30,31 +36,47 @@ const ctxmenuOpenFor = new BaseProperty<TuneId>(null);
 //   }
 // });
 
+function useTuneList() {
+  const currentAlbumId = useCurrentAlbumId();
+  const [tunes, setTunes] = useState<IndexedTunes>(new IndexedTunes());
+  useEffect(() => {
+    if (!currentAlbumId) return;
+    run(async () => {
+      console.log("start loading");
+      const kanjiHint = getAlbumKanjiHint(currentAlbumId);
+      const tunes = DAO.lookupTunesInAlbum(currentAlbumId);
+      const indexed = (await kanjiHint).indexTunes(await tunes);
+      setTunes(indexed);
+    });
+  }, [currentAlbumId]);
+  return { tunes, indices: Array.from(tunes).map(([k]) => k) };
+}
+
 export const TuneList: React.FC = () => {
   const [scrollValue, setScrollValue] = useState(0);
-  const [tunes] = useState<[string, Tune[]][]>([["A", []]]);
+  const { tunes, indices } = useTuneList();
+
   // const isLoading = albumManager.current.tunes.value.state === "pending";
+
   return <div id="album_tune_list">
-    <AlbumIndicies indices={tunes.map(([k]) => k)} />
+    <AlbumIndicies indices={indices} />
     <SignInButton />
     ..._if(isLoading, loadingSpinner()),
-    <div id="album_container_tunes">
-      <RenderListItems tunesIndexed={tunes} />
-    </div>
+    <RenderListItems tunesIndexed={tunes} />
   </div>;
 };
 
 const AlbumIndicies: React.FC<{ indices: string[] }> = ({ indices }) => {
   return <div id="album_indices">
-    {indices.map((idx) => {
+    {indices.map((idx) =>
       <div
         className="album_index_jump"
         key={idx}
         onClick={jumpToIndex(idx)}
       >
         {idx}
-      </div>;
-    })}
+      </div>
+    )}
   </div>;
 };
 
@@ -79,27 +101,35 @@ const jumpToIndex = (key: string) =>
     });
   };
 
-const RenderListItems: React.FC<{ tunesIndexed: [string, Tune[]][] }> = (
+const RenderListItems: React.FC<{ tunesIndexed: IndexedTunes }> = (
   { tunesIndexed },
 ) => {
-  const elems: ReactElement[] = [];
-  for (const [index, tunes] of tunesIndexed) {
-    elems.push(
-      <div className="section_label" key={`index_${index}`} data-anchor={index}>
-        {index}
-      </div>,
-    );
-    for (const tune of tunes) {
-      const ctxmenuOpen = ctxmenuOpenFor.value === tune.id;
-      elems.push(
-        <div className="tune" key={tune.id}>
-          <div className="tune_name">{tune.name}</div>
-          ctxmenu(tune, ctxmenuOpen, onCloseCtxMenu)
-        </div>,
-      );
-    }
-  }
-  return <>{elems}</>;
+  const [i18n] = useLocale();
+  const [contextOpenFor, setContextOpen] = useState<string>("");
+  const ItemTune: React.FC<{ tune: Tune }> = ({ tune }) => {
+    const ctxmenuOpen = contextOpenFor === tune.id;
+    return <div className="tune">
+      <div className="tune_name">{tune.name}</div>
+      <Ctxmenu
+        item={tune}
+        shown={ctxmenuOpen}
+        onCloseCtxMenu={() => {
+          setContextOpen("");
+        }}
+        i18n={i18n}
+      />
+    </div>;
+  };
+  return <div id="album_container_tunes">
+    {Array.from(tunesIndexed).map(([index, tunes]) =>
+      <React.Fragment key={index}>
+        <div className="section_label" data-anchor={index}>
+          {index}
+        </div>
+        {tunes.map((tune) => <ItemTune key={tune.id} tune={tune} />)}
+      </React.Fragment>
+    )}
+  </div>;
 };
 
 function isEventOnLabel(e: Event) {

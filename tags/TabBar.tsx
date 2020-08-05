@@ -6,7 +6,7 @@ import { useState } from "react";
 import { Album } from "../scripts/album";
 import * as React from "react";
 
-export const TabBar: React.FC = () => {
+export const TabBar: React.FC<{ albumName: string }> = ({ albumName }) => {
   const [isTabListOpen, setTabListOpen] = useState(false);
   const [scores, setScores] = useState<Tune[]>([]);
 
@@ -18,7 +18,7 @@ export const TabBar: React.FC = () => {
 
   return <div className="tabbar">
     <BackButton />
-    <AlbumNameTab />
+    <AlbumNameTab albumName={albumName} />
     <div className="tab_tune_container">
       {scores.map((tune) => <TuneTab tune={tune} key={tune.id} />)}
     </div>
@@ -46,10 +46,7 @@ const BackButton: React.FC = () => {
   return <div className="back_home tab" onClick={clickBack}>[arrow()]</div>;
 };
 
-const AlbumNameTab: React.FC = () => {
-  const [name] = useState<PromiseState<string>>({ state: "pending" });
-  const [album] = useState<Album>();
-
+const AlbumNameTab: React.FC<{ albumName: string }> = ({ albumName }) => {
   function onClickAlbumTab(e: React.MouseEvent<HTMLDivElement>) {
     activateRipple(e.currentTarget, () => {
       // backToAlbum();
@@ -59,9 +56,9 @@ const AlbumNameTab: React.FC = () => {
   return <div
     className="tab_album_name tab"
     onClick={onClickAlbumTab}
-    data-active={!!album}
+    data-active={!!albumName}
   >
-    {PromiseState.orElse(name, "")}
+    {albumName}
   </div>;
 };
 

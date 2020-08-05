@@ -11,6 +11,7 @@ import { DAO } from "../scripts/dao/dao";
 import { showToast } from "../scripts/logic";
 import { useEffect, useState, useCallback } from "react";
 import { useQueryParam } from "../scripts/state";
+import * as React from "react";
 
 export const Menubar: React.FC = () => {
   const [i18n] = useLocale();
@@ -26,7 +27,7 @@ export const Menubar: React.FC = () => {
           setMenuOpen(false);
         }
       },
-      false
+      false,
     );
   }, []);
 
@@ -37,7 +38,7 @@ export const Menubar: React.FC = () => {
         setMenuOpen(false);
       });
     },
-    [itemId]
+    [itemId],
   );
 
   function onCloseTab(e: React.MouseEvent) {
@@ -117,19 +118,21 @@ export const Ctxmenu: React.FC<{
   };
   return (
     <div className="ctxmenu_wrap">
-      {shown ? (
-        <>
-          <div className="ctxmenu" onClick={onCloseCtxMenu}></div>
-          <div className="menu_item" onClick={onOpenScoreFile}>
-            {i18n.menu.openOriginal}
-          </div>
-          <div className="menu_item menu_item_close" onClick={onCloseCtxMenu}>
-            [cross()]
-          </div>
-        </>
-      ) : (
-        <></>
-      )}
+      {shown
+        ? (
+          <>
+            <div className="ctxmenu" onClick={onCloseCtxMenu}></div>
+            <div className="menu_item" onClick={onOpenScoreFile}>
+              {i18n.menu.openOriginal}
+            </div>
+            <div className="menu_item menu_item_close" onClick={onCloseCtxMenu}>
+              [cross()]
+            </div>
+          </>
+        )
+        : (
+          <></>
+        )}
     </div>
   );
 };
