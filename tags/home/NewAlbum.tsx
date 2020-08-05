@@ -5,10 +5,7 @@ import { NewAlbumDesktop } from "./NewAlbumDT";
 import { BaseProperty } from "hojoki";
 import * as React from "react";
 import { useState } from "react";
-
-function openAlbum(id: string) {
-  //TODO:
-}
+import { useHistory } from "react-router";
 
 export const NewAlbum: React.FC = () => {
   const [disabled, setDisabled] = useState(true);
@@ -18,6 +15,11 @@ export const NewAlbum: React.FC = () => {
 
   const [i18n] = useLocale();
   const account = useAccount();
+  const h = useHistory();
+
+  function openAlbum(id: string) {
+    h.push(`/view?album=${id}`);
+  }
 
   let throttle: number;
 
@@ -34,7 +36,7 @@ export const NewAlbum: React.FC = () => {
         },
         (_) => {
           setDisabled(true);
-        },
+        }
       );
     }, 300);
   }
@@ -54,7 +56,7 @@ export const NewAlbum: React.FC = () => {
       },
       (_) => {
         setDisabled(true);
-      },
+      }
     );
   }
 
@@ -71,11 +73,7 @@ export const NewAlbum: React.FC = () => {
             onInput={oninput}
             placeholder={i18n.newAlbumFromURL.placeholder}
           />
-          <button
-            id="home_new_album_button"
-            type="submit"
-            disabled={disabled}
-          >
+          <button id="home_new_album_button" type="submit" disabled={disabled}>
             {i18n.newAlbumFromURL.buttonLabel}
           </button>
         </form>
