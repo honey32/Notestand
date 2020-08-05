@@ -3,6 +3,7 @@
 
 import { wait, run, waitLowPriority } from "../util/lazy";
 import { useState } from "react";
+import { useRecoilState, RecoilState, atom } from "recoil";
 // import { account } from "../store";
 
 export interface GDriveFile {
@@ -23,8 +24,13 @@ let account: string = "";
 //   return account;
 // }
 
+const account_r = atom<string>({
+  key: "google_account_name",
+  default: "",
+});
+
 export function useAccount() {
-  const [name, setName] = useState("");
+  const [name, setName] = useRecoilState(account_r);
   const signIn = async () => {
     const u = await GDrive.signIn();
     setName(u.getBasicProfile().getName());

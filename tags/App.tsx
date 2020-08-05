@@ -5,11 +5,20 @@ import { LocaleContextProvider } from "../scripts/i18n";
 import { BrowserRouter, Link } from "react-router-dom";
 import { Route, Switch } from "react-router";
 import { MainView } from "./MainView";
+import { RecoilRoot } from "recoil";
+
+const ContextWrap: React.FC = ({ children }) => {
+  return (
+    <RecoilRoot>
+      <LocaleContextProvider>{children}</LocaleContextProvider>
+    </RecoilRoot>
+  );
+};
 
 const App: React.FC<{}> = () => {
   return (
     <div>
-      <LocaleContextProvider>
+      <ContextWrap>
         <BrowserRouter basename="/app">
           <Switch>
             <Route path="/view/">
@@ -21,7 +30,7 @@ const App: React.FC<{}> = () => {
             </Route>
           </Switch>
         </BrowserRouter>
-      </LocaleContextProvider>
+      </ContextWrap>
     </div>
   );
 };
