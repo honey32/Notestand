@@ -57,6 +57,11 @@
 
   & > .tab_name {
     margin-right: 0.8rem;
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
   }
 
   & > .tab_close {

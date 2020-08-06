@@ -46,6 +46,7 @@ function useOpenScores() {
 export const TabBar: React.FC<{ albumName: string }> = ({ albumName }) => {
   const [isTabListOpen, setTabListOpen] = useState(false);
   const scoresOpen = useOpenScores();
+  const currentAlbumId = useCurrentAlbumId();
 
   function onTabListOpen(e: React.MouseEvent<HTMLDivElement>) {
     activateRipple(e.currentTarget, () => {
@@ -59,7 +60,7 @@ export const TabBar: React.FC<{ albumName: string }> = ({ albumName }) => {
       <AlbumNameTab albumName={albumName} />
       <div className="tab_tune_container">
         {scoresOpen.map((tune) => (
-          <TuneTab tune={tune} key={tune.id} />
+          <TuneTab tune={tune} key={tune.id} album={currentAlbumId} />
         ))}
       </div>
       <div
@@ -99,6 +100,7 @@ const BackButton: React.FC = () => {
 };
 
 const AlbumNameTab: React.FC<{ albumName: string }> = ({ albumName }) => {
+  const albumId = useCurrentAlbumId();
   function onClickAlbumTab(e: React.MouseEvent<HTMLDivElement>) {
     activateRipple(e.currentTarget, () => {
       // backToAlbum();
@@ -111,7 +113,7 @@ const AlbumNameTab: React.FC<{ albumName: string }> = ({ albumName }) => {
       onClick={onClickAlbumTab}
       data-active={!!albumName}
     >
-      {albumName}
+      <Link to={`/view?album=${albumId}`}>{albumName}</Link>
     </div>
   );
 };
@@ -129,7 +131,7 @@ const MenuOpenButton: React.FC = () => {
   );
 };
 
-const TuneTab: React.FC<{ tune: Tune }> = ({ tune }) => {
+const TuneTab: React.FC<{ tune: Tune; album: string }> = ({ tune, album }) => {
   const isViewed = false; //TODO:
   function onClickTuneTab(e: React.MouseEvent) {
     const target = e.target as HTMLElement;
@@ -152,7 +154,9 @@ const TuneTab: React.FC<{ tune: Tune }> = ({ tune }) => {
       data-active={isViewed}
       onClick={onClickTuneTab}
     >
-      <div className="tab_name">{tune.name}</div>
+      <div className="tab_name">
+        <Link to={`/view?score=${tune.id}&album=${album}`}>{tune.name}</Link>
+      </div>
       <div className="tab_close">[cross()]</div>
     </div>
   );
