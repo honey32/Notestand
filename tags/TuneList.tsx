@@ -17,6 +17,8 @@ import { Album } from "../scripts/album";
 import { getAlbumKanjiHint, IndexedTunes } from "../scripts/search";
 import { useLocale } from "../scripts/i18n";
 import { Link } from "react-router-dom";
+import { useRecoilState } from "recoil";
+import { albumTuneListR } from "./MainView";
 
 type TuneId = string;
 const ctxmenuOpenFor = new BaseProperty<TuneId>(null);
@@ -36,7 +38,7 @@ const ctxmenuOpenFor = new BaseProperty<TuneId>(null);
 
 function useTuneList() {
   const currentAlbumId = useCurrentAlbumId();
-  const [tunes, setTunes] = useState<IndexedTunes>(new IndexedTunes());
+  const [tunes, setTunes] = useRecoilState<IndexedTunes>(albumTuneListR);
   useEffect(() => {
     if (!currentAlbumId) return;
     run(async () => {

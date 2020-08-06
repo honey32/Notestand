@@ -2,15 +2,50 @@ import { activateRipple } from "./commons/ripple";
 import { arrow, hanburber, tabs, cross } from "./icon/icons";
 import { PromiseState } from "hojoki";
 import { Tune } from "../scripts/tune";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Album } from "../scripts/album";
 import * as React from "react";
-import { useQueryParam } from "../scripts/state";
+import {
+  useQueryParam,
+  useCurrentScoreId,
+  useCurrentAlbumId,
+} from "../scripts/state";
 import { Link, useHistory } from "react-router-dom";
+import { atom, useRecoilState } from "recoil";
+import { albumTuneListR } from "./MainView";
+
+const scoresOpenR = atom<Tune[]>({
+  key: "scores/open",
+  default: [],
+});
+
+function useOpenScores() {
+  const [scoresOpen, setScoresOpen] = useRecoilState(scoresOpenR);
+  const s = useCurrentScoreId();
+  const a = useCurrentAlbumId();
+  const [tuneList] = useRecoilState(albumTuneListR);
+
+  useEffect(() => {
+    setScoresOpen([]);
+  }, [a]);
+
+  useEffect(() => {
+    const newScore = Array.from(tuneList.getTunesSorted()).find(
+      ({ id }) => id === s
+    );
+    if (!newScore) {
+      return;
+    }
+    console.log(Array.from(tuneList.getTunesSorted()));
+    console.log([newScore, ...scoresOpen]);
+    setScoresOpen((r) => [newScore, ...r]);
+  }, [s, tuneList]);
+  return scoresOpen;
+}
 
 export const TabBar: React.FC<{ albumName: string }> = ({ albumName }) => {
   const [isTabListOpen, setTabListOpen] = useState(false);
-  const [scores, setScores] = useState<Tune[]>([]);
+  const scoresOpen = useOpenScores();
 
   function onTabListOpen(e: React.MouseEvent<HTMLDivElement>) {
     activateRipple(e.currentTarget, () => {
@@ -18,21 +53,25 @@ export const TabBar: React.FC<{ albumName: string }> = ({ albumName }) => {
     });
   }
 
-  return <div className="tabbar">
-    <BackButton />
-    <AlbumNameTab albumName={albumName} />
-    <div className="tab_tune_container">
-      {scores.map((tune) => <TuneTab tune={tune} key={tune.id} />)}
+  return (
+    <div className="tabbar">
+      <BackButton />
+      <AlbumNameTab albumName={albumName} />
+      <div className="tab_tune_container">
+        {scoresOpen.map((tune) => (
+          <TuneTab tune={tune} key={tune.id} />
+        ))}
+      </div>
+      <div
+        className="mob_tablist_open_button"
+        onClick={onTabListOpen}
+        hidden={!scoresOpen.length}
+      >
+        [tabs()],
+      </div>
+      <MenuOpenButton />
     </div>
-    <div
-      className="mob_tablist_open_button"
-      onClick={onTabListOpen}
-      hidden={!scores.length}
-    >
-      [tabs()],
-    </div>
-    <MenuOpenButton />
-  </div>;
+  );
 };
 
 const BackButton: React.FC = () => {
@@ -52,11 +91,11 @@ const BackButton: React.FC = () => {
 
   const backUrl = shouldBackToHome ? "/" : `/view?album=${q.get("album")}`;
 
-  return <div className="back_home tab">
-    <Link to={backUrl}>
-      [arrow()]
-    </Link>
-  </div>;
+  return (
+    <div className="back_home tab">
+      <Link to={backUrl}>[arrow()]</Link>
+    </div>
+  );
 };
 
 const AlbumNameTab: React.FC<{ albumName: string }> = ({ albumName }) => {
@@ -66,13 +105,15 @@ const AlbumNameTab: React.FC<{ albumName: string }> = ({ albumName }) => {
     });
   }
 
-  return <div
-    className="tab_album_name tab"
-    onClick={onClickAlbumTab}
-    data-active={!!albumName}
-  >
-    {albumName}
-  </div>;
+  return (
+    <div
+      className="tab_album_name tab"
+      onClick={onClickAlbumTab}
+      data-active={!!albumName}
+    >
+      {albumName}
+    </div>
+  );
 };
 
 const MenuOpenButton: React.FC = () => {
@@ -81,9 +122,11 @@ const MenuOpenButton: React.FC = () => {
       // isMenuOpen.value = true;
     });
   }
-  return <div className="menu-open-button" onClick={onMenuOpen}>
-    [hanburber()]
-  </div>;
+  return (
+    <div className="menu-open-button" onClick={onMenuOpen}>
+      [hanburber()]
+    </div>
+  );
 };
 
 const TuneTab: React.FC<{ tune: Tune }> = ({ tune }) => {
@@ -103,12 +146,14 @@ const TuneTab: React.FC<{ tune: Tune }> = ({ tune }) => {
     //   });
     // }
   }
-  return <div
-    className="tab tab-tune"
-    data-active={isViewed}
-    onClick={onClickTuneTab}
-  >
-    <div className="tab_name">{tune.name}</div>
-    <div className="tab_close">[cross()]</div>
-  </div>;
+  return (
+    <div
+      className="tab tab-tune"
+      data-active={isViewed}
+      onClick={onClickTuneTab}
+    >
+      <div className="tab_name">{tune.name}</div>
+      <div className="tab_close">[cross()]</div>
+    </div>
+  );
 };
