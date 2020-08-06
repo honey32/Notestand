@@ -1,27 +1,19 @@
-// import { state, albumManager } from "../scripts/store";
-import { _if, getScrollOriginElement } from "./utils";
-import { Tune } from "../scripts/tune";
-import { activateRipple } from "./commons/ripple";
-import { SignInButton } from "./home/AccountInfo";
-import { Ctxmenu } from "./menubar";
-import { TabBar } from "./TabBar";
-import { loadingSpinner } from "./commons/load_spinner";
-// import { projector } from "./tags";
-import { BaseProperty, each2 } from "hojoki";
-import { useState, ReactElement, useEffect } from "react";
 import * as React from "react";
-import { useCurrentAlbumId } from "../scripts/state";
-import { DAO } from "../scripts/dao/dao";
-import { run } from "../scripts/util/lazy";
-import { Album } from "../scripts/album";
-import { getAlbumKanjiHint, IndexedTunes } from "../scripts/search";
-import { useLocale } from "../scripts/i18n";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useRecoilState } from "recoil";
+import { DAO } from "../scripts/dao/dao";
+import { useLocale } from "../scripts/i18n";
+import { getAlbumKanjiHint, IndexedTunes } from "../scripts/search";
+import { useCurrentAlbumId } from "../scripts/state";
+import { Tune } from "../scripts/tune";
+import { run } from "../scripts/util/lazy";
+import { activateRipple } from "./commons/ripple";
+import { SignInButton } from "./home/AccountInfo";
 import { albumTuneListR } from "./MainView";
+import { Ctxmenu } from "./menubar";
 
 type TuneId = string;
-const ctxmenuOpenFor = new BaseProperty<TuneId>(null);
 
 // let scrollValue = 0;
 // state.c(each2()).addEventListener(({ newValue, oldValue }) => {
@@ -55,8 +47,6 @@ function useTuneList() {
 export const TuneList: React.FC = () => {
   const [scrollValue, setScrollValue] = useState(0);
   const { tunes, indices } = useTuneList();
-
-  // const isLoading = albumManager.current.tunes.value.state === "pending";
 
   return (
     <div id="album_tune_list">
@@ -142,42 +132,34 @@ const RenderListItems: React.FC<{ tunesIndexed: IndexedTunes }> = ({
   );
 };
 
-function isEventOnLabel(e: Event) {
-  const target = e.target as Element;
-  return target.classList.contains("section_label");
-}
+// function isEventOnLabel(e: Event) {
+//   const target = e.target as Element;
+//   return target.classList.contains("section_label");
+// }
 
-function getBoundTune(e: Event): [Tune, Element] {
-  const target = e.target as Element;
-  const tuneDom = target.closest(".tune_name");
-  return [tuneDom["tune-bound"] as Tune, tuneDom];
-}
+// function getBoundTune(e: Event): [Tune, Element] {
+//   const target = e.target as Element;
+//   const tuneDom = target.closest(".tune_name");
+//   return [tuneDom["tune-bound"] as Tune, tuneDom];
+// }
 
-function onClickTune(e: Event) {
-  if (isEventOnLabel(e)) return;
-  const [tune, tuneDom] = getBoundTune(e);
-  activateRipple(tuneDom, () => {
-    // openTune(tune.id);
-  });
-}
+// function onContextMenuTune(e: Event) {
+//   if (isEventOnLabel(e)) return;
+//   const [tune] = getBoundTune(e);
 
-function onContextMenuTune(e: Event) {
-  if (isEventOnLabel(e)) return;
-  const [tune] = getBoundTune(e);
+//   if (ctxmenuOpenFor.value !== tune.id) {
+//     ctxmenuOpenFor.value = tune.id;
+//     e.preventDefault();
+//   }
+// }
 
-  if (ctxmenuOpenFor.value !== tune.id) {
-    ctxmenuOpenFor.value = tune.id;
-    e.preventDefault();
-  }
-}
+// document.addEventListener("click", (e) => {
+//   if (!(e.target as HTMLElement).closest("#album_tune_list")) {
+//     ctxmenuOpenFor.value = null;
+//   }
+// });
 
-document.addEventListener("click", (e) => {
-  if (!(e.target as HTMLElement).closest("#album_tune_list")) {
-    ctxmenuOpenFor.value = null;
-  }
-});
-
-function onCloseCtxMenu(e: Event) {
-  ctxmenuOpenFor.value = null;
-  e.stopPropagation();
-}
+// function onCloseCtxMenu(e: Event) {
+//   ctxmenuOpenFor.value = null;
+//   e.stopPropagation();
+// }

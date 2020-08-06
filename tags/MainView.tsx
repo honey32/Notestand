@@ -1,6 +1,3 @@
-// import { state } from "../scripts/store";
-// import { h } from "maquette";
-// import { tabbar } from "./tabbar";
 import * as React from "react";
 import { TabBar } from "./TabBar";
 import { TuneList } from "./TuneList";

@@ -1,10 +1,8 @@
-import { h } from "maquette";
 import { theme, Theme } from "../scripts/store";
 import { _if } from "./utils";
 import { activateRipple } from "./commons/ripple";
 import { useLocale, MessageAsset } from "../scripts/i18n";
 import { cross } from "./icon/icons";
-// import { closeTune } from '../scripts/router';
 import { Album } from "../scripts/album";
 import { Tune } from "../scripts/tune";
 import { DAO } from "../scripts/dao/dao";
@@ -27,7 +25,7 @@ export const Menubar: React.FC = () => {
           setMenuOpen(false);
         }
       },
-      false,
+      false
     );
   }, []);
 
@@ -38,7 +36,7 @@ export const Menubar: React.FC = () => {
         setMenuOpen(false);
       });
     },
-    [itemId],
+    [itemId]
   );
 
   function onCloseTab(e: React.MouseEvent) {
@@ -118,21 +116,19 @@ export const Ctxmenu: React.FC<{
   };
   return (
     <div className="ctxmenu_wrap">
-      {shown
-        ? (
-          <>
-            <div className="ctxmenu" onClick={onCloseCtxMenu}></div>
-            <div className="menu_item" onClick={onOpenScoreFile}>
-              {i18n.menu.openOriginal}
-            </div>
-            <div className="menu_item menu_item_close" onClick={onCloseCtxMenu}>
-              [cross()]
-            </div>
-          </>
-        )
-        : (
-          <></>
-        )}
+      {shown ? (
+        <>
+          <div className="ctxmenu" onClick={onCloseCtxMenu}></div>
+          <div className="menu_item" onClick={onOpenScoreFile}>
+            {i18n.menu.openOriginal}
+          </div>
+          <div className="menu_item menu_item_close" onClick={onCloseCtxMenu}>
+            [cross()]
+          </div>
+        </>
+      ) : (
+        <></>
+      )}
     </div>
   );
 };

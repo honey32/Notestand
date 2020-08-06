@@ -1,8 +1,6 @@
-// import { account } from "../../scripts/store";
 import { GDrive, useAccount } from "../../scripts/back/gdrive";
 import { useLocale } from "../../scripts/i18n";
 import * as React from "react";
-import { useState } from "react";
 
 export function AccountInfo() {
   if (process.env.NODE_ENV === "desktop") {

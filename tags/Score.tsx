@@ -1,7 +1,5 @@
 import { Tune } from "../scripts/tune";
-import { h } from "maquette";
 import { scoreManager } from "../scripts/store";
-import { flatmap, _if } from "./utils";
 // import { openNextTune } from "../scripts/router";
 import { loadingSpinner } from "./commons/load_spinner";
 import { run, throttled } from "../scripts/util/lazy";
@@ -27,30 +25,38 @@ export const Scores: React.FC = () => {
   const [scores] = useState<Tune[]>([]);
   const [msg, setMsg] = useState<string>("");
   const [q] = useQueryParam();
-  return <div id="scores_container" hidden={!q.has("score")}>
-    {scores.map((tune) => <Score tune={tune} shown={false} />)}
-    <PopupMessage msg={msg} />
-  </div>;
+  return (
+    <div id="scores_container" hidden={!q.has("score")}>
+      {scores.map((tune) => (
+        <Score tune={tune} shown={false} />
+      ))}
+      <PopupMessage msg={msg} />
+    </div>
+  );
 };
 
 const PopupMessage: React.FC<{ msg: string }> = ({ msg }) => {
-  return <div className="popup_message" hidden={!msg}>{msg}</div>;
+  return (
+    <div className="popup_message" hidden={!msg}>
+      {msg}
+    </div>
+  );
 };
 
 const Score: React.FC<{ tune: Tune; shown: boolean }> = ({ tune, shown }) => {
-  return <div
-    className="score"
-    key={tune.id}
-    // afterCreate: setRenderingHook
-    // onTouchstart={touchStart}
-    // onTouchmove={handleOverSwipe}
-    hidden={!shown}
-  >
-    loadingManager.isLoading(tune) ?
-    <div className="score_loading_spinner_wrapper">
-      loadingSpinner(),
+  return (
+    <div
+      className="score"
+      key={tune.id}
+      // afterCreate: setRenderingHook
+      // onTouchstart={touchStart}
+      // onTouchmove={handleOverSwipe}
+      hidden={!shown}
+    >
+      loadingManager.isLoading(tune) ?
+      <div className="score_loading_spinner_wrapper">loadingSpinner(),</div>
     </div>
-  </div>;
+  );
 };
 
 async function setRenderingHook(this: Tune, elem: Element) {

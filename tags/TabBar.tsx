@@ -1,17 +1,14 @@
-import { activateRipple } from "./commons/ripple";
-import { arrow, hanburber, tabs, cross } from "./icon/icons";
-import { PromiseState } from "hojoki";
-import { Tune } from "../scripts/tune";
-import { useState, useEffect } from "react";
-import { Album } from "../scripts/album";
 import * as React from "react";
-import {
-  useQueryParam,
-  useCurrentScoreId,
-  useCurrentAlbumId,
-} from "../scripts/state";
-import { Link, useHistory } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { atom, useRecoilState } from "recoil";
+import {
+  useCurrentAlbumId,
+  useCurrentScoreId,
+  useQueryParam,
+} from "../scripts/state";
+import { Tune } from "../scripts/tune";
+import { activateRipple } from "./commons/ripple";
 import { albumTuneListR } from "./MainView";
 
 const scoresOpenR = atom<Tune[]>({
@@ -80,19 +77,7 @@ export const TabBar: React.FC<{ albumName: string }> = ({ albumName }) => {
 
 const BackButton: React.FC = () => {
   const [q, err] = useQueryParam();
-  const h = useHistory();
   const shouldBackToHome = err ? true : !q.has("score") || !q.has("album");
-
-  function clickBack(e: React.MouseEvent<HTMLDivElement>) {
-    activateRipple(e.currentTarget, () => {
-      // if (state.value === "Score" && albumManager.current.album.value) {
-      //   backToAlbum();
-      // } else {
-      //   backHome();
-      // }
-    });
-  }
-
   const backUrl = shouldBackToHome ? "/" : `/view?album=${q.get("album")}`;
 
   return (
@@ -103,37 +88,19 @@ const BackButton: React.FC = () => {
 };
 
 const AlbumNameTab: React.FC<{ albumName: string }> = ({ albumName }) => {
-  const albumId = useCurrentAlbumId();
   const [q, err] = useQueryParam();
   const active = !err && q.has("album") && !q.has("score");
-  function onClickAlbumTab(e: React.MouseEvent<HTMLDivElement>) {
-    activateRipple(e.currentTarget, () => {
-      // backToAlbum();
-    });
-  }
+  const albumId = q.get("album");
 
   return (
-    <div
-      className="tab_album_name tab"
-      onClick={onClickAlbumTab}
-      data-active={active}
-    >
+    <div className="tab_album_name tab" data-active={active}>
       <Link to={`/view?album=${albumId}`}>{albumName}</Link>
     </div>
   );
 };
 
 const MenuOpenButton: React.FC = () => {
-  function onMenuOpen(e: React.MouseEvent<HTMLDivElement>) {
-    activateRipple(e.currentTarget, () => {
-      // isMenuOpen.value = true;
-    });
-  }
-  return (
-    <div className="menu-open-button" onClick={onMenuOpen}>
-      [hanburber()]
-    </div>
-  );
+  return <div className="menu-open-button">[hanburber()]</div>;
 };
 
 const TuneTab: React.FC<{ tune: Tune; album: string; viewed: boolean }> = ({
@@ -141,23 +108,8 @@ const TuneTab: React.FC<{ tune: Tune; album: string; viewed: boolean }> = ({
   album,
   viewed,
 }) => {
-  function onClickTuneTab(e: React.MouseEvent) {
-    const target = e.target as HTMLElement;
-    // const close_btn = target.closest(".tab_close");
-    // const tab = target.closest(".tab");
-
-    // if (close_btn) {
-    // activateRipple(close_btn, () => {
-    // closeTune(tab["tune-bound"]);
-    //   });
-    // } else if (tab) {
-    //   activateRipple(tab, () => {
-    // openTune(tab["tune-bound"].id);
-    //   });
-    // }
-  }
   return (
-    <div className="tab tab-tune" data-active={viewed} onClick={onClickTuneTab}>
+    <div className="tab tab-tune" data-active={viewed}>
       <div className="tab_name">
         <Link to={`/view?score=${tune.id}&album=${album}`}>{tune.name}</Link>
       </div>
