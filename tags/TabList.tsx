@@ -1,32 +1,34 @@
-import { h } from "maquette/dist/h";
-import { flatmap } from "./utils";
-import { scoreManager } from "../scripts/store";
-import { cross } from "./icon/icons";
-import { Tune } from "../scripts/tune";
-// import { openTune, closeTune } from '../scripts/router';
-// import { isTabListOpen } from './main_view';
-import { activateRipple } from "./commons/ripple";
-import { useEffect, useState } from "react";
 import * as React from "react";
+import { useEffect, useState } from "react";
+import { Tune } from "../scripts/tune";
+import { Cross } from "./icon/icons";
 
 export const MbTabList: React.FC<{ scores: Tune[] }> = ({ scores }) => {
   const [isTabListOpen, setTabListOpen] = useState<boolean>(false);
   useEffect(() => {
-    document.addEventListener("click", (e) => {
-      if (!(e.target as HTMLElement).closest(".mob_tab_list")) {
-        setTabListOpen(false);
-      }
-    }, false);
+    document.addEventListener(
+      "click",
+      (e) => {
+        if (!(e.target as HTMLElement).closest(".mob_tab_list")) {
+          setTabListOpen(false);
+        }
+      },
+      false
+    );
   }, []);
 
-  return <div className="mob_tab_list" hidden={!isTabListOpen}>
-    {scores.map((tune) =>
-      <div className="tab" key={tune.id}>
-        <div className="tab_name">{tune.name}</div>
-        <div className="tab_close_button">[cross()]</div>
-      </div>
-    )}
-  </div>;
+  return (
+    <div className="mob_tab_list" hidden={!isTabListOpen}>
+      {scores.map((tune) => (
+        <div className="tab" key={tune.id}>
+          <div className="tab_name">{tune.name}</div>
+          <div className="tab_close_button">
+            <Cross />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 };
 
 function onclick(e: Event) {

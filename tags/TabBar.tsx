@@ -9,6 +9,7 @@ import {
 } from "../scripts/state";
 import { Tune } from "../scripts/tune";
 import { activateRipple } from "./commons/ripple";
+import { Arrow, Cross, Hanburger, Tabs } from "./icon/Icons";
 import { albumTuneListR } from "./MainView";
 
 const scoresOpenR = atom<Tune[]>({
@@ -68,7 +69,7 @@ export const TabBar: React.FC<{ albumName: string }> = ({ albumName }) => {
         onClick={onTabListOpen}
         hidden={!scoresOpen.length}
       >
-        [tabs()],
+        <Tabs />
       </div>
       <MenuOpenButton />
     </div>
@@ -82,7 +83,9 @@ const BackButton: React.FC = () => {
 
   return (
     <div className="back_home tab">
-      <Link to={backUrl}>[arrow()]</Link>
+      <Link to={backUrl}>
+        <Arrow />
+      </Link>
     </div>
   );
 };
@@ -100,7 +103,11 @@ const AlbumNameTab: React.FC<{ albumName: string }> = ({ albumName }) => {
 };
 
 const MenuOpenButton: React.FC = () => {
-  return <div className="menu-open-button">[hanburber()]</div>;
+  return (
+    <div className="menu-open-button">
+      <Hanburger />
+    </div>
+  );
 };
 
 const TuneTab: React.FC<{ tune: Tune; album: string; viewed: boolean }> = ({
@@ -113,7 +120,9 @@ const TuneTab: React.FC<{ tune: Tune; album: string; viewed: boolean }> = ({
       <div className="tab_name">
         <Link to={`/view?score=${tune.id}&album=${album}`}>{tune.name}</Link>
       </div>
-      <div className="tab_close">[cross()]</div>
+      <div className="tab_close">
+        <Cross />
+      </div>
     </div>
   );
 };

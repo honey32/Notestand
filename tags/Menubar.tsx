@@ -1,15 +1,14 @@
-import { theme, Theme } from "../scripts/store";
-import { _if } from "./utils";
-import { activateRipple } from "./commons/ripple";
-import { useLocale, MessageAsset } from "../scripts/i18n";
-import { cross } from "./icon/icons";
-import { Album } from "../scripts/album";
-import { Tune } from "../scripts/tune";
-import { DAO } from "../scripts/dao/dao";
-import { showToast } from "../scripts/logic";
-import { useEffect, useState, useCallback } from "react";
-import { useQueryParam } from "../scripts/state";
 import * as React from "react";
+import { useCallback, useEffect, useState } from "react";
+import { Album } from "../scripts/album";
+import { DAO } from "../scripts/dao/dao";
+import { MessageAsset, useLocale } from "../scripts/i18n";
+import { showToast } from "../scripts/logic";
+import { useQueryParam } from "../scripts/state";
+import { theme, Theme } from "../scripts/store";
+import { Tune } from "../scripts/tune";
+import { activateRipple } from "./commons/ripple";
+import { Cross } from "./icon/icons";
 
 export const Menubar: React.FC = () => {
   const [i18n] = useLocale();
@@ -79,7 +78,7 @@ export const Menubar: React.FC = () => {
   return (
     <div id="menubar" hidden={!isMenuOpen}>
       <div id="menu-close-button" onClick={onCloseMenu}>
-        [cross()]
+        <Cross />
       </div>
       ,
       <div className="menu_item" onClick={onOpenScoreFile}>
@@ -123,7 +122,7 @@ export const Ctxmenu: React.FC<{
             {i18n.menu.openOriginal}
           </div>
           <div className="menu_item menu_item_close" onClick={onCloseCtxMenu}>
-            [cross()]
+            <Cross />
           </div>
         </>
       ) : (
