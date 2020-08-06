@@ -44,6 +44,7 @@ export const TabBar: React.FC<{ albumName: string }> = ({ albumName }) => {
   const [isTabListOpen, setTabListOpen] = useState(false);
   const scoresOpen = useOpenScores();
   const currentAlbumId = useCurrentAlbumId();
+  const currentScoreId = useCurrentScoreId();
 
   function onTabListOpen(e: React.MouseEvent<HTMLDivElement>) {
     activateRipple(e.currentTarget, () => {
@@ -57,7 +58,12 @@ export const TabBar: React.FC<{ albumName: string }> = ({ albumName }) => {
       <AlbumNameTab albumName={albumName} />
       <div className="tab_tune_container">
         {scoresOpen.map((tune) => (
-          <TuneTab tune={tune} key={tune.id} album={currentAlbumId} />
+          <TuneTab
+            tune={tune}
+            key={tune.id}
+            album={currentAlbumId}
+            viewed={currentScoreId === tune.id}
+          />
         ))}
       </div>
       <div
@@ -98,6 +104,8 @@ const BackButton: React.FC = () => {
 
 const AlbumNameTab: React.FC<{ albumName: string }> = ({ albumName }) => {
   const albumId = useCurrentAlbumId();
+  const [q, err] = useQueryParam();
+  const active = !err && q.has("album") && !q.has("score");
   function onClickAlbumTab(e: React.MouseEvent<HTMLDivElement>) {
     activateRipple(e.currentTarget, () => {
       // backToAlbum();
@@ -108,7 +116,7 @@ const AlbumNameTab: React.FC<{ albumName: string }> = ({ albumName }) => {
     <div
       className="tab_album_name tab"
       onClick={onClickAlbumTab}
-      data-active={!!albumName}
+      data-active={active}
     >
       <Link to={`/view?album=${albumId}`}>{albumName}</Link>
     </div>
@@ -128,8 +136,11 @@ const MenuOpenButton: React.FC = () => {
   );
 };
 
-const TuneTab: React.FC<{ tune: Tune; album: string }> = ({ tune, album }) => {
-  const isViewed = false; //TODO:
+const TuneTab: React.FC<{ tune: Tune; album: string; viewed: boolean }> = ({
+  tune,
+  album,
+  viewed,
+}) => {
   function onClickTuneTab(e: React.MouseEvent) {
     const target = e.target as HTMLElement;
     // const close_btn = target.closest(".tab_close");
@@ -146,11 +157,7 @@ const TuneTab: React.FC<{ tune: Tune; album: string }> = ({ tune, album }) => {
     // }
   }
   return (
-    <div
-      className="tab tab-tune"
-      data-active={isViewed}
-      onClick={onClickTuneTab}
-    >
+    <div className="tab tab-tune" data-active={viewed} onClick={onClickTuneTab}>
       <div className="tab_name">
         <Link to={`/view?score=${tune.id}&album=${album}`}>{tune.name}</Link>
       </div>

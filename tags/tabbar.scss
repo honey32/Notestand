@@ -50,7 +50,7 @@
       min-width: 8rem;
     }
 
-    &.active {
+    &[data-active="true"] {
       background-color: var(--color-bg);
     }
   }
