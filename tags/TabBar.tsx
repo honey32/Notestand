@@ -33,11 +33,8 @@ function useOpenScores() {
     const newScore = Array.from(tuneList.getTunesSorted()).find(
       ({ id }) => id === s
     );
-    if (!newScore) {
-      return;
-    }
-    console.log(Array.from(tuneList.getTunesSorted()));
-    console.log([newScore, ...scoresOpen]);
+    if (!newScore) return;
+    if (scoresOpen.find(({ id }) => id === s)) return;
     setScoresOpen((r) => [newScore, ...r]);
   }, [s, tuneList]);
   return scoresOpen;
