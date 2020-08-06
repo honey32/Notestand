@@ -2,20 +2,20 @@ import * as React from "react";
 import { useEffect, useState } from "react";
 import { Tune } from "../scripts/tune";
 import { Cross } from "./icon/icons";
+import { useGlobalEventListener } from "./utils";
 
 export const MbTabList: React.FC<{ scores: Tune[] }> = ({ scores }) => {
   const [isTabListOpen, setTabListOpen] = useState<boolean>(false);
-  useEffect(() => {
-    document.addEventListener(
-      "click",
-      (e) => {
-        if (!(e.target as HTMLElement).closest(".mob_tab_list")) {
-          setTabListOpen(false);
-        }
-      },
-      false
-    );
-  }, []);
+  useGlobalEventListener(
+    document,
+    "click",
+    (e) => {
+      if (!(e.target as HTMLElement).closest(".mob_tab_list")) {
+        setTabListOpen(false);
+      }
+    },
+    false
+  );
 
   return (
     <div className="mob_tab_list" hidden={!isTabListOpen}>

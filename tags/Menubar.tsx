@@ -9,6 +9,7 @@ import { theme, Theme } from "../scripts/store";
 import { Tune } from "../scripts/tune";
 import { activateRipple } from "./commons/ripple";
 import { Cross } from "./icon/icons";
+import { useGlobalEventListener } from "./utils";
 
 export const Menubar: React.FC = () => {
   const [i18n] = useLocale();
@@ -16,17 +17,16 @@ export const Menubar: React.FC = () => {
   const [q] = useQueryParam();
   const state = q.has("score") ? "Score" : "Album";
   const itemId = q.get("score") ?? q.get("album");
-  useEffect(() => {
-    document.addEventListener(
-      "click",
-      (e) => {
-        if (!(e.target as HTMLElement).closest("#menubar")) {
-          setMenuOpen(false);
-        }
-      },
-      false
-    );
-  }, []);
+  useGlobalEventListener(
+    document,
+    "click",
+    (e) => {
+      if (!(e.target as HTMLElement).closest("#menubar")) {
+        setMenuOpen(false);
+      }
+    },
+    false
+  );
 
   const onOpenScoreFile = useCallback(
     (e: React.MouseEvent) => {
