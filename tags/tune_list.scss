@@ -78,6 +78,11 @@ body {
       @include rippleable;
       padding: 0.8rem;
       font-size: 1.2rem;
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
     }
 
     .ctxmenu {

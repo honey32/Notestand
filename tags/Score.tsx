@@ -9,6 +9,7 @@ import { BaseProperty } from "hojoki";
 import { diff, getClientPos } from "../scripts/util/vec2";
 import { useState } from "react";
 import * as React from "react";
+import { useQueryParam } from "../scripts/state";
 
 const loadingManager = run(() => {
   const map = new BaseProperty(new Map<string, boolean>());
@@ -25,7 +26,8 @@ const loadingManager = run(() => {
 export const Scores: React.FC = () => {
   const [scores] = useState<Tune[]>([]);
   const [msg, setMsg] = useState<string>("");
-  return <div id="scores_container">
+  const [q] = useQueryParam();
+  return <div id="scores_container" hidden={!q.has("score")}>
     {scores.map((tune) => <Score tune={tune} shown={false} />)}
     <PopupMessage msg={msg} />
   </div>;

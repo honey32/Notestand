@@ -1,8 +1,5 @@
 // import { state, albumManager } from "../scripts/store";
-import {
-  _if,
-  getScrollOriginElement,
-} from "./utils";
+import { _if, getScrollOriginElement } from "./utils";
 import { Tune } from "../scripts/tune";
 import { activateRipple } from "./commons/ripple";
 import { SignInButton } from "./home/AccountInfo";
@@ -19,6 +16,7 @@ import { run } from "../scripts/util/lazy";
 import { Album } from "../scripts/album";
 import { getAlbumKanjiHint, IndexedTunes } from "../scripts/search";
 import { useLocale } from "../scripts/i18n";
+import { Link } from "react-router-dom";
 
 type TuneId = string;
 const ctxmenuOpenFor = new BaseProperty<TuneId>(null);
@@ -58,78 +56,88 @@ export const TuneList: React.FC = () => {
 
   // const isLoading = albumManager.current.tunes.value.state === "pending";
 
-  return <div id="album_tune_list">
-    <AlbumIndicies indices={indices} />
-    <SignInButton />
-    ..._if(isLoading, loadingSpinner()),
-    <RenderListItems tunesIndexed={tunes} />
-  </div>;
+  return (
+    <div id="album_tune_list">
+      <AlbumIndicies indices={indices} />
+      <SignInButton />
+      ..._if(isLoading, loadingSpinner()),
+      <RenderListItems tunesIndexed={tunes} />
+    </div>
+  );
 };
 
 const AlbumIndicies: React.FC<{ indices: string[] }> = ({ indices }) => {
-  return <div id="album_indices">
-    {indices.map((idx) =>
-      <div
-        className="album_index_jump"
-        key={idx}
-        onClick={jumpToIndex(idx)}
-      >
-        {idx}
-      </div>
-    )}
-  </div>;
+  return (
+    <div id="album_indices">
+      {indices.map((idx) => (
+        <div className="album_index_jump" key={idx} onClick={jumpToIndex(idx)}>
+          {idx}
+        </div>
+      ))}
+    </div>
+  );
 };
 
-const jumpToIndex = (key: string) =>
-  (e: React.MouseEvent) => {
-    const elem = e.target as HTMLElement;
-    activateRipple(elem, () => {});
-    const tunesContainer = elem.closest("#album_tune_list").querySelector(
-      "#album_container_tunes",
-    );
-    const label = tunesContainer.querySelector(
-      `.section_label[data-anchor=${key}]`,
-    );
-    let target = label;
-    for (let i = 0; i < 2 && target.previousElementSibling; i++) {
-      target = target.previousElementSibling;
-    }
+const jumpToIndex = (key: string) => (e: React.MouseEvent) => {
+  const elem = e.target as HTMLElement;
+  activateRipple(elem, () => {});
+  const tunesContainer = elem
+    .closest("#album_tune_list")
+    .querySelector("#album_container_tunes");
+  const label = tunesContainer.querySelector(
+    `.section_label[data-anchor=${key}]`
+  );
+  let target = label;
+  for (let i = 0; i < 2 && target.previousElementSibling; i++) {
+    target = target.previousElementSibling;
+  }
 
-    target.scrollIntoView({
-      block: "start",
-      behavior: "smooth",
-    });
-  };
+  target.scrollIntoView({
+    block: "start",
+    behavior: "smooth",
+  });
+};
 
-const RenderListItems: React.FC<{ tunesIndexed: IndexedTunes }> = (
-  { tunesIndexed },
-) => {
+const RenderListItems: React.FC<{ tunesIndexed: IndexedTunes }> = ({
+  tunesIndexed,
+}) => {
   const [i18n] = useLocale();
   const [contextOpenFor, setContextOpen] = useState<string>("");
+  const albumId = useCurrentAlbumId();
   const ItemTune: React.FC<{ tune: Tune }> = ({ tune }) => {
     const ctxmenuOpen = contextOpenFor === tune.id;
-    return <div className="tune">
-      <div className="tune_name">{tune.name}</div>
-      <Ctxmenu
-        item={tune}
-        shown={ctxmenuOpen}
-        onCloseCtxMenu={() => {
-          setContextOpen("");
-        }}
-        i18n={i18n}
-      />
-    </div>;
-  };
-  return <div id="album_container_tunes">
-    {Array.from(tunesIndexed).map(([index, tunes]) =>
-      <React.Fragment key={index}>
-        <div className="section_label" data-anchor={index}>
-          {index}
+    return (
+      <div className="tune">
+        <div className="tune_name">
+          <Link to={`/view?score=${tune.id}&album=${albumId}`}>
+            {tune.name}
+          </Link>
         </div>
-        {tunes.map((tune) => <ItemTune key={tune.id} tune={tune} />)}
-      </React.Fragment>
-    )}
-  </div>;
+        <Ctxmenu
+          item={tune}
+          shown={ctxmenuOpen}
+          onCloseCtxMenu={() => {
+            setContextOpen("");
+          }}
+          i18n={i18n}
+        />
+      </div>
+    );
+  };
+  return (
+    <div id="album_container_tunes">
+      {Array.from(tunesIndexed).map(([index, tunes]) => (
+        <React.Fragment key={index}>
+          <div className="section_label" data-anchor={index}>
+            {index}
+          </div>
+          {tunes.map((tune) => (
+            <ItemTune key={tune.id} tune={tune} />
+          ))}
+        </React.Fragment>
+      ))}
+    </div>
+  );
 };
 
 function isEventOnLabel(e: Event) {
