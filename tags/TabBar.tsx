@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { atom, useRecoilState } from "recoil";
+import { atom, useRecoilState, useRecoilValue } from "recoil";
 import {
   useCurrentAlbumId,
   useCurrentScoreId,
@@ -21,7 +21,7 @@ function useOpenScores() {
   const [scoresOpen, setScoresOpen] = useRecoilState(scoresOpenR);
   const s = useCurrentScoreId();
   const a = useCurrentAlbumId();
-  const [tuneList] = useRecoilState(albumTuneListR);
+  const tuneList = useRecoilValue(albumTuneListR);
 
   useEffect(() => {
     setScoresOpen([]);
