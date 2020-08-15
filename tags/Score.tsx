@@ -10,30 +10,52 @@ import * as React from "react";
 import { useQueryParam, useCurrentScoreId } from "../scripts/state";
 import { RenderingProcess, getPages } from "../scripts/pdf/pdfhelper";
 
+function pushAtIndex<V>(r: Record<string, V[]>, key: string, value?: V) {
+  if (r[key] === undefined && value === undefined) {
+    return { ...r, [key]: [] };
+  }
+  if (value === undefined) {
+    return r;
+  }
+  const arr = r[key] ?? [];
+  return { ...r, [key]: [...arr, value] };
+}
+
+function removeFromArray<V>(arr: V[], value: V) {
+  const set = new Set(arr);
+  set.delete(value);
+  return Array.from(set);
+}
+
 function useLoadingManager() {
   const [value, setValue] = useState<Record<string, string[]>>({});
+  const [loading, setLoading] = useState<string[]>([]);
   const score = useCurrentScoreId();
   useEffect(() => {
     if (!score || Object.keys(value).includes(score)) return;
     const process = getPages(score);
-    setValue((v) => ({ ...v, [score]: [] }));
+    setLoading((v) => [...v, score]);
+    setValue((v) => pushAtIndex(v, score));
     run(async () => {
       for (const p of await process) {
         const html = (await p).outerHTML;
-        setValue((v) => {
-          v[score].push(html);
-          return v;
-        });
+        setValue((v) => pushAtIndex(v, score, html));
       }
+      setLoading((v) => removeFromArray(v, score));
     });
   }, [score]);
-  return value;
+  return {
+    scores: value,
+    isLoading(id: string) {
+      return loading.includes(id);
+    },
+  };
 }
 
 export const Scores: React.FC = () => {
   const [msg, setMsg] = useState<string>("");
   const [q] = useQueryParam();
-  const loadingManager = useLoadingManager();
+  const { scores, isLoading } = useLoadingManager();
   const [n, updator] = useState(0);
   useEffect(() => {
     setTimeout(() => {
@@ -43,12 +65,13 @@ export const Scores: React.FC = () => {
 
   return (
     <div id="scores_container" hidden={!q.has("score")}>
-      {Object.entries(loadingManager).map(([tune, rp]) => (
+      {Object.entries(scores).map(([tune, rp]) => (
         <Score
           key={tune}
           tuneId={tune}
           shown={q.get("score") === tune}
           rp={rp}
+          loading={isLoading(tune)}
         />
       ))}
       <PopupMessage msg={msg} />
@@ -64,8 +87,13 @@ const PopupMessage: React.FC<{ msg: string }> = ({ msg }) => {
   );
 };
 
-type ScoreProps = { tuneId: string; shown: boolean; rp: string[] };
-const Score: React.FC<ScoreProps> = ({ tuneId, shown, rp }) => {
+type ScoreProps = {
+  tuneId: string;
+  shown: boolean;
+  rp: string[];
+  loading: boolean;
+};
+const Score: React.FC<ScoreProps> = ({ tuneId, shown, rp, loading }) => {
   return (
     <div
       className="score"
@@ -75,7 +103,7 @@ const Score: React.FC<ScoreProps> = ({ tuneId, shown, rp }) => {
       // onTouchmove={handleOverSwipe}
       hidden={!shown}
     >
-      <div className="score_loading_spinner_wrapper">
+      <div className="score_loading_spinner_wrapper" hidden={!loading}>
         <LoadingSpinner />
       </div>
       {rp.map((page, idx) => (
@@ -91,18 +119,18 @@ const Score: React.FC<ScoreProps> = ({ tuneId, shown, rp }) => {
   );
 };
 
-async function setRenderingHook(this: Tune, elem: Element) {
-  elem.addEventListener("touchstart", touchStart);
-  elem.addEventListener("touchmove", throttled(handleOverSwipe, 100));
-  elem.addEventListener("touchend", releaseLock);
-  elem.addEventListener("touchcancel", releaseLock);
-  loadingManager.setLoading(this, "on");
-  const renderingProcess = scoreManager.getRenderingProcess(this);
-  for (const page of await renderingProcess.graphics) {
-    elem.appendChild(await page);
-  }
-  loadingManager.setLoading(this, "off");
-}
+// async function setRenderingHook(this: Tune, elem: Element) {
+//   elem.addEventListener("touchstart", touchStart);
+//   elem.addEventListener("touchmove", throttled(handleOverSwipe, 100));
+//   elem.addEventListener("touchend", releaseLock);
+//   elem.addEventListener("touchcancel", releaseLock);
+//   loadingManager.setLoading(this, "on");
+//   const renderingProcess = scoreManager.getRenderingProcess(this);
+//   for (const page of await renderingProcess.graphics) {
+//     elem.appendChild(await page);
+//   }
+//   loadingManager.setLoading(this, "off");
+// }
 
 let start: [number, number] = [0, 0];
 let lock = false;
