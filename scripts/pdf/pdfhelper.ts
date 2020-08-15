@@ -7,17 +7,17 @@ type NestedPromiseArray<V> = Promise<Promise<V>[]>;
 
 const wait_ms_fg = 100;
 
-export class RenderingProcess {
-  graphics: SVGElement[] = [];
+// export class RenderingProcess {
+//   graphics: SVGElement[] = [];
 
-  constructor(tuneId: TuneId) {
-    run(async () => {
-      for (const page of await getPages(tuneId)) {
-        this.graphics.push(await page);
-      }
-    });
-  }
-}
+//   constructor(tuneId: TuneId) {
+//     run(async () => {
+//       for (const page of await getPages(tuneId)) {
+//         this.graphics.push(await page);
+//       }
+//     });
+//   }
+// }
 
 export async function getPages(tuneId: TuneId): Promise<Promise<SVGElement>[]> {
   const document = await getDocument(tuneId);

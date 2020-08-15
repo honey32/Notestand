@@ -11,6 +11,7 @@ import { Tune } from "../scripts/tune";
 import { activateRipple } from "./commons/ripple";
 import { Arrow, Cross, Hanburger, Tabs } from "./icon/Icons";
 import { albumTuneListR } from "./MainView";
+import { pushToArray, findById } from "../scripts/util/immut";
 
 const scoresOpenR = atom<Tune[]>({
   key: "scores/open",
@@ -28,12 +29,10 @@ function useOpenScores() {
   }, [a]);
 
   useEffect(() => {
-    const newScore = Array.from(tuneList.getTunesSorted()).find(
-      ({ id }) => id === s,
-    );
+    const newScore = findById(Array.from(tuneList.getTunesSorted()), s);
     if (!newScore) return;
-    if (scoresOpen.find(({ id }) => id === s)) return;
-    setScoresOpen((r) => [...r, newScore]);
+    if (findById(scoresOpen, s)) return;
+    setScoresOpen(pushToArray(newScore));
   }, [s, tuneList]);
   return scoresOpen;
 }

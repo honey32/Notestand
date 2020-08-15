@@ -45,7 +45,7 @@ function useTuneList() {
       setTunes(indexed);
     });
   }, [currentAlbumId]);
-  return { loading, tunes, indices: Array.from(tunes).map(([k]) => k) };
+  return { loading, tunes, indices: tunes.indices };
 }
 
 export const TuneList: React.FC = () => {

@@ -1,77 +1,87 @@
-import { Tune } from "../scripts/tune";
-import { scoreManager, state } from "../scripts/store";
+import * as React from "react";
+import { useEffect, useState } from "react";
+import { getPages } from "../scripts/pdf/pdfhelper";
+import { useCurrentScoreId, useQueryParam } from "../scripts/state";
+import {
+  pushAtIndex,
+  pushToArray,
+  removeFromArray,
+} from "../scripts/util/immut";
+import { run } from "../scripts/util/lazy";
+import { diff, getClientPos } from "../scripts/util/vec2";
 // import { openNextTune } from "../scripts/router";
 import { LoadingSpinner } from "./commons/LoadingSpinner";
-import { run, throttled } from "../scripts/util/lazy";
-import { BaseProperty } from "hojoki";
-import { diff, getClientPos } from "../scripts/util/vec2";
-import { useState, useEffect } from "react";
-import * as React from "react";
-import { useQueryParam, useCurrentScoreId } from "../scripts/state";
-import { RenderingProcess, getPages } from "../scripts/pdf/pdfhelper";
 
-function pushAtIndex<V>(r: Record<string, V[]>, key: string, value?: V) {
-  if (r[key] === undefined && value === undefined) {
-    return { ...r, [key]: [] };
-  }
-  if (value === undefined) {
-    return r;
-  }
-  const arr = r[key] ?? [];
-  return { ...r, [key]: [...arr, value] };
+function useScorePages() {
+  const [scoreFiles, setScoreFiles] = useState<Record<string, string[]>>({});
+  return {
+    scoreFiles,
+    yieldPage(scoreId: string, value?: string) {
+      setScoreFiles(pushAtIndex(scoreId, value));
+    },
+  };
 }
 
-function removeFromArray<V>(arr: V[], value: V) {
-  const set = new Set(arr);
-  set.delete(value);
-  return Array.from(set);
+function useLoadingStates() {
+  const [value, setLoading] = useState<string[]>([]);
+  return {
+    value,
+    startLoading(id: string) {
+      setLoading(pushToArray(id));
+    },
+    finishLoading(id: string) {
+      setLoading(removeFromArray(id));
+    },
+    isLoading(id: string) {
+      return value.includes(id);
+    },
+  };
 }
-
 function useLoadingManager() {
-  const [value, setValue] = useState<Record<string, string[]>>({});
-  const [loading, setLoading] = useState<string[]>([]);
+  const { scoreFiles, yieldPage } = useScorePages();
+  const { startLoading, finishLoading, isLoading } = useLoadingStates();
   const score = useCurrentScoreId();
   useEffect(() => {
-    if (!score || Object.keys(value).includes(score)) return;
+    if (!score || Object.keys(scoreFiles).includes(score)) return;
     const process = getPages(score);
-    setLoading((v) => [...v, score]);
-    setValue((v) => pushAtIndex(v, score));
+    startLoading(score);
+    yieldPage(score, undefined);
     run(async () => {
       for (const p of await process) {
         const html = (await p).outerHTML;
-        setValue((v) => pushAtIndex(v, score, html));
+        yieldPage(score, html);
       }
-      setLoading((v) => removeFromArray(v, score));
+      finishLoading(score);
     });
   }, [score]);
   return {
-    scores: value,
-    isLoading(id: string) {
-      return loading.includes(id);
-    },
+    scores: Object.entries(scoreFiles).map(
+      ([k, v]) => [k, v, isLoading(k)] as const
+    ),
   };
 }
 
 export const Scores: React.FC = () => {
   const [msg, setMsg] = useState<string>("");
   const [q] = useQueryParam();
-  const { scores, isLoading } = useLoadingManager();
+  const { scores } = useLoadingManager();
   const [n, updator] = useState(0);
   useEffect(() => {
     setTimeout(() => {
       updator((v) => v + 1);
     }, 1000);
   }, [n]);
+  const isScoreShown = (id: string) => q.get("score") === id;
 
   return (
     <div id="scores_container" hidden={!q.has("score")}>
-      {Object.entries(scores).map(([tune, rp]) => (
+      {scores.map(([tune, rp, loading]) => (
         <Score
           key={tune}
           tuneId={tune}
-          shown={q.get("score") === tune}
+          shown={isScoreShown(tune)}
           rp={rp}
-          loading={isLoading(tune)}
+          loading={loading}
         />
       ))}
       <PopupMessage msg={msg} />
