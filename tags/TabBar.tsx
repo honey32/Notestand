@@ -85,11 +85,9 @@ const BackButton: React.FC = () => {
   const backUrl = shouldBackToHome ? "/" : `/view?album=${q.get("album")}`;
 
   return (
-    <div className="back_home tab">
-      <Link to={backUrl}>
-        <Arrow />
-      </Link>
-    </div>
+    <Link to={backUrl} className="back_home tab">
+      <Arrow />
+    </Link>
   );
 };
 
@@ -99,9 +97,13 @@ const AlbumNameTab: React.FC<{ albumName: string }> = ({ albumName }) => {
   const albumId = q.get("album");
 
   return (
-    <div className="tab_album_name tab" data-active={active}>
-      <Link to={`/view?album=${albumId}`}>{albumName}</Link>
-    </div>
+    <Link
+      to={`/view?album=${albumId}`}
+      className="tab_album_name tab"
+      data-active={active}
+    >
+      {albumName}
+    </Link>
   );
 };
 
@@ -119,13 +121,15 @@ const TuneTab: React.FC<{ tune: Tune; album: string; viewed: boolean }> = ({
   viewed,
 }) => {
   return (
-    <div className="tab tab-tune" data-active={viewed}>
-      <div className="tab_name">
-        <Link to={`/view?score=${tune.id}&album=${album}`}>{tune.name}</Link>
-      </div>
+    <Link
+      to={`/view?score=${tune.id}&album=${album}`}
+      className="tab tab-tune"
+      data-active={viewed}
+    >
+      <div className="tab_name">{tune.name}</div>
       <div className="tab_close">
         <Cross />
       </div>
-    </div>
+    </Link>
   );
 };
