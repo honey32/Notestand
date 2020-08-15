@@ -5,7 +5,7 @@ import { useRecoilState, RecoilRoot } from "recoil";
 import { DAO } from "../scripts/dao/dao";
 import { useLocale } from "../scripts/i18n";
 import { getAlbumKanjiHint, IndexedTunes } from "../scripts/search";
-import { useCurrentAlbumId } from "../scripts/state";
+import { useCurrentAlbumId, useQueryParam } from "../scripts/state";
 import { Tune } from "../scripts/tune";
 import { run } from "../scripts/util/lazy";
 import { activateRipple } from "./commons/ripple";
@@ -51,9 +51,10 @@ function useTuneList() {
 export const TuneList: React.FC = () => {
   const [scrollValue, setScrollValue] = useState(0);
   const { loading, tunes, indices } = useTuneList();
+  const [q] = useQueryParam();
 
   return (
-    <div id="album_tune_list">
+    <div id="album_tune_list" hidden={q.has("score") || !q.has("album")}>
       <AlbumIndicies indices={indices} />
       <SignInButton />
       {loading ? <LoadingSpinner /> : <></>}
@@ -74,26 +75,25 @@ const AlbumIndicies: React.FC<{ indices: string[] }> = ({ indices }) => {
   );
 };
 
-const jumpToIndex = (key: string) =>
-  (e: React.MouseEvent) => {
-    const elem = e.target as HTMLElement;
-    activateRipple(elem, () => {});
-    const tunesContainer = elem
-      .closest("#album_tune_list")
-      .querySelector("#album_container_tunes");
-    const label = tunesContainer.querySelector(
-      `.section_label[data-anchor=${key}]`,
-    );
-    let target = label;
-    for (let i = 0; i < 2 && target.previousElementSibling; i++) {
-      target = target.previousElementSibling;
-    }
+const jumpToIndex = (key: string) => (e: React.MouseEvent) => {
+  const elem = e.target as HTMLElement;
+  activateRipple(elem, () => {});
+  const tunesContainer = elem
+    .closest("#album_tune_list")
+    .querySelector("#album_container_tunes");
+  const label = tunesContainer.querySelector(
+    `.section_label[data-anchor=${key}]`
+  );
+  let target = label;
+  for (let i = 0; i < 2 && target.previousElementSibling; i++) {
+    target = target.previousElementSibling;
+  }
 
-    target.scrollIntoView({
-      block: "start",
-      behavior: "smooth",
-    });
-  };
+  target.scrollIntoView({
+    block: "start",
+    behavior: "smooth",
+  });
+};
 
 const RenderListItems: React.FC<{ tunesIndexed: IndexedTunes }> = ({
   tunesIndexed,

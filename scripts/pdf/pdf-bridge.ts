@@ -1,18 +1,13 @@
+import {
+  GlobalWorkerOptions,
+  PDFPageProxy,
+  ViewportParameters,
+  PDFDocumentProxy,
+} from "pdfjs-dist";
 import * as pdfjs from "pdfjs-dist";
 
-window["PDFJS"].workerSrc = "/app/pdf.worker.min.js";
-
-export type Document = {
-  numPages: number;
-  getPage(num: number): PdfPage;
-};
-
-export type PdfPage = {
-  getOperatorList(): Promise<OpList>;
-  getViewport(scale: number, rotation: number): Viewport;
-  commonObjs: PdfObjects;
-  objs: PdfObjects;
-};
+// window["PDFJS"].workerSrc = "/app/pdf.worker.min.js";
+GlobalWorkerOptions.workerSrc = "/app/pdf.worker.min.js";
 
 type OpList = {};
 
@@ -28,30 +23,28 @@ type SVGGraphics = {
   getSVG(opList: OpList, viewPort: Viewport): SVGElement;
 };
 
-export const SVGGraphics: SVGGraphicsCtor = pdfjs.SVGGraphics;
+// @ts-ignore
+const SVGGraphics: SVGGraphicsCtor = pdfjs.SVGGraphics;
 
-export function getDocument(arr: Uint8Array): Document {
-  return pdfjs.getDocument(arr);
+export async function getDocument(arr: Uint8Array) {
+  return pdfjs.getDocument(arr).promise;
 }
 
-type ViewportOptions = {
-  scale: number;
-  rotation: number;
-};
-
 export async function renderPdfPageAsSVG(
-  page: PdfPage,
-  option: ViewportOptions = { scale: 1, rotation: 0 }
+  page: PDFPageProxy,
+  option: ViewportParameters = { scale: 1, rotation: 0 }
 ): Promise<SVGElement> {
+  // @ts-ignore
   const opList = page.getOperatorList();
-  const viewport = page.getViewport(option.scale, option.rotation);
+  const viewport = page.getViewport(option);
+  // @ts-ignore
   const svggfx = new SVGGraphics(page.commonObjs, page.objs);
   return svggfx.getSVG(await opList, viewport);
 }
 
 export async function forEachPages<R>(
-  document: Document,
-  fn: (page: PdfPage, idx?: number) => Promise<R>
+  document: PDFDocumentProxy,
+  fn: (page: PDFPageProxy, idx?: number) => Promise<R>
 ) {
   const result = Array<Promise<R>>(document.numPages);
   for (let i = 0; i < document.numPages; i++) {

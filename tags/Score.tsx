@@ -1,34 +1,55 @@
 import { Tune } from "../scripts/tune";
-import { scoreManager } from "../scripts/store";
+import { scoreManager, state } from "../scripts/store";
 // import { openNextTune } from "../scripts/router";
 import { LoadingSpinner } from "./commons/LoadingSpinner";
 import { run, throttled } from "../scripts/util/lazy";
 import { BaseProperty } from "hojoki";
 import { diff, getClientPos } from "../scripts/util/vec2";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import * as React from "react";
-import { useQueryParam } from "../scripts/state";
+import { useQueryParam, useCurrentScoreId } from "../scripts/state";
+import { RenderingProcess, getPages } from "../scripts/pdf/pdfhelper";
 
-const loadingManager = run(() => {
-  const map = new BaseProperty(new Map<string, boolean>());
-  return {
-    isLoading(tune: Tune): boolean {
-      return map.value.get(tune.id) || false;
-    },
-    setLoading(tune: Tune, on_off: "on" | "off") {
-      map.mutate((m) => m.set(tune.id, on_off === "on"));
-    },
-  };
-});
+function useLoadingManager() {
+  const [value, setValue] = useState<Record<string, string[]>>({});
+  const score = useCurrentScoreId();
+  useEffect(() => {
+    if (!score || Object.keys(value).includes(score)) return;
+    const process = getPages(score);
+    setValue((v) => ({ ...v, [score]: [] }));
+    run(async () => {
+      for (const p of await process) {
+        const html = (await p).outerHTML;
+        setValue((v) => {
+          v[score].push(html);
+          return v;
+        });
+      }
+    });
+  }, [score]);
+  return value;
+}
 
 export const Scores: React.FC = () => {
-  const [scores] = useState<Tune[]>([]);
   const [msg, setMsg] = useState<string>("");
   const [q] = useQueryParam();
+  const loadingManager = useLoadingManager();
+  const [n, updator] = useState(0);
+  useEffect(() => {
+    setTimeout(() => {
+      updator((v) => v + 1);
+    }, 1000);
+  }, [n]);
+
   return (
     <div id="scores_container" hidden={!q.has("score")}>
-      {scores.map((tune) => (
-        <Score tune={tune} shown={false} />
+      {Object.entries(loadingManager).map(([tune, rp]) => (
+        <Score
+          key={tune}
+          tuneId={tune}
+          shown={q.get("score") === tune}
+          rp={rp}
+        />
       ))}
       <PopupMessage msg={msg} />
     </div>
@@ -43,18 +64,29 @@ const PopupMessage: React.FC<{ msg: string }> = ({ msg }) => {
   );
 };
 
-const Score: React.FC<{ tune: Tune; shown: boolean }> = ({ tune, shown }) => {
+type ScoreProps = { tuneId: string; shown: boolean; rp: string[] };
+const Score: React.FC<ScoreProps> = ({ tuneId, shown, rp }) => {
   return (
     <div
       className="score"
-      key={tune.id}
+      key={tuneId}
       // afterCreate: setRenderingHook
       // onTouchstart={touchStart}
       // onTouchmove={handleOverSwipe}
       hidden={!shown}
     >
-      loadingManager.isLoading(tune) ?
-      <div className="score_loading_spinner_wrapper">loadingSpinner(),</div>
+      <div className="score_loading_spinner_wrapper">
+        <LoadingSpinner />
+      </div>
+      {rp.map((page, idx) => (
+        <div
+          key={idx}
+          className="svg_wrapper"
+          dangerouslySetInnerHTML={{
+            __html: page,
+          }}
+        ></div>
+      ))}
     </div>
   );
 };

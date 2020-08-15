@@ -1,43 +1,47 @@
-import { wait } from '../util/lazy';
-import { Tune } from '../tune';
-import { Document, PdfPage } from './pdf-bridge';
-import { DAO } from '../dao/dao';
+import { wait, run } from "../util/lazy";
+import { DAO } from "../dao/dao";
+import { PDFDocumentProxy, PDFPageProxy } from "pdfjs-dist";
 
-type NestedPromiseArray<V> = Promise<Promise<V>[]>
+type TuneId = string;
+type NestedPromiseArray<V> = Promise<Promise<V>[]>;
 
 const wait_ms_fg = 100;
 
 export class RenderingProcess {
-    graphics: NestedPromiseArray<SVGElement>
+  graphics: SVGElement[] = [];
 
-    constructor (tune: Tune) {
-      this.graphics = this.getPages(tune);
+  constructor(tuneId: TuneId) {
+    run(async () => {
+      for (const page of await getPages(tuneId)) {
+        this.graphics.push(await page);
+      }
+    });
+  }
+}
+
+export async function getPages(tuneId: TuneId): Promise<Promise<SVGElement>[]> {
+  const document = await getDocument(tuneId);
+
+  const lib = await import("./pdf-bridge");
+  return lib.forEachPages(document, async (page, i) => {
+    if (i >= 2) {
+      await wait(wait_ms_fg);
     }
+    return renderPage(page);
+  });
+}
 
-    async getPages (tune: Tune): NestedPromiseArray<SVGElement> {
-      const document = await this.getDocument(tune);
+async function getDocument(tuneId: TuneId): Promise<PDFDocumentProxy> {
+  const bin = await DAO.getTuneContent(tuneId);
+  const lib = await import("./pdf-bridge");
+  return await lib.getDocument(bin);
+}
 
-      const lib = await import('./pdf-bridge');
-      return lib.forEachPages(document, async (page, i) => {
-        if (i >= 2) {
-          await wait(wait_ms_fg);
-        }
-        return this.renderPage(page);
-      });
-    }
-
-    async getDocument (tune: Tune): Promise<Document> {
-      const bin = await DAO.getTuneContent(tune.id);
-      const lib = await import('./pdf-bridge');
-      return lib.getDocument(bin);
-    }
-
-    async renderPage (page: PdfPage): Promise<SVGElement> {
-      const lib = await import('./pdf-bridge');
-      const svg = await lib.renderPdfPageAsSVG(page);
-      svg.removeAttribute('width');
-      svg.removeAttribute('height');
-      svg.removeAttribute('preserveAspectRatio');
-      return svg;
-    }
+async function renderPage(page: PDFPageProxy): Promise<SVGElement> {
+  const lib = await import("./pdf-bridge");
+  const svg = await lib.renderPdfPageAsSVG(page);
+  svg.removeAttribute("width");
+  svg.removeAttribute("height");
+  svg.removeAttribute("preserveAspectRatio");
+  return svg;
 }
