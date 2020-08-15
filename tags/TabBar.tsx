@@ -29,11 +29,11 @@ function useOpenScores() {
 
   useEffect(() => {
     const newScore = Array.from(tuneList.getTunesSorted()).find(
-      ({ id }) => id === s
+      ({ id }) => id === s,
     );
     if (!newScore) return;
     if (scoresOpen.find(({ id }) => id === s)) return;
-    setScoresOpen((r) => [newScore, ...r]);
+    setScoresOpen((r) => [...r, newScore]);
   }, [s, tuneList]);
   return scoresOpen;
 }
