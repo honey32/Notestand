@@ -5,6 +5,8 @@ import { Cross } from "./icon/icons";
 import { useGlobalEventListener } from "./utils";
 import { atom } from "recoil";
 import { useRecoilState } from "recoil";
+import { Link } from "react-router-dom";
+import { useQueryParam } from "../scripts/state";
 
 export const tabListOpenR = atom<boolean>({
   key: "mobile_tablist_open",
@@ -13,6 +15,7 @@ export const tabListOpenR = atom<boolean>({
 
 export const MbTabList: React.FC<{ scores: Tune[] }> = ({ scores }) => {
   const [isTabListOpen, setTabListOpen] = useRecoilState(tabListOpenR);
+  const [q] = useQueryParam();
   useGlobalEventListener(
     document,
     "click",
@@ -26,15 +29,20 @@ export const MbTabList: React.FC<{ scores: Tune[] }> = ({ scores }) => {
     false
   );
 
+  const linkUrl = (id: string) =>
+    `/view?score=${id}` + (q.has("album") ? `&album=${q.get("album")}` : "");
+
   return (
     <div className="mob_tab_list" hidden={!isTabListOpen}>
       {scores.map((tune) => (
-        <div className="tab" key={tune.id}>
+        // <div className="tab" key={tune.id}>
+        <Link className="tab" key={tune.id} to={linkUrl(tune.id)}>
           <div className="tab_name">{tune.name}</div>
           <div className="tab_close_button">
             <Cross />
           </div>
-        </div>
+        </Link>
+        // </div>
       ))}
     </div>
   );
