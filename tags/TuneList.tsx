@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useRecoilState } from "recoil";
+import { useRecoilState, RecoilRoot } from "recoil";
 import { DAO } from "../scripts/dao/dao";
 import { useLocale } from "../scripts/i18n";
 import { getAlbumKanjiHint, IndexedTunes } from "../scripts/search";
@@ -12,6 +12,7 @@ import { activateRipple } from "./commons/ripple";
 import { SignInButton } from "./home/AccountInfo";
 import { albumTuneListR } from "./MainView";
 import { Ctxmenu } from "./menubar";
+import { LoadingSpinner } from "./commons/LoadingSpinner";
 
 type TuneId = string;
 
@@ -31,28 +32,31 @@ type TuneId = string;
 function useTuneList() {
   const currentAlbumId = useCurrentAlbumId();
   const [tunes, setTunes] = useRecoilState<IndexedTunes>(albumTuneListR);
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
     if (!currentAlbumId) return;
     run(async () => {
       console.log("start loading");
+      setLoading(true);
       const kanjiHint = getAlbumKanjiHint(currentAlbumId);
       const tunes = DAO.lookupTunesInAlbum(currentAlbumId);
       const indexed = (await kanjiHint).indexTunes(await tunes);
+      setLoading(false);
       setTunes(indexed);
     });
   }, [currentAlbumId]);
-  return { tunes, indices: Array.from(tunes).map(([k]) => k) };
+  return { loading, tunes, indices: Array.from(tunes).map(([k]) => k) };
 }
 
 export const TuneList: React.FC = () => {
   const [scrollValue, setScrollValue] = useState(0);
-  const { tunes, indices } = useTuneList();
+  const { loading, tunes, indices } = useTuneList();
 
   return (
     <div id="album_tune_list">
       <AlbumIndicies indices={indices} />
       <SignInButton />
-      ..._if(isLoading, loadingSpinner()),
+      {loading ? <LoadingSpinner /> : <></>}
       <RenderListItems tunesIndexed={tunes} />
     </div>
   );
@@ -70,25 +74,26 @@ const AlbumIndicies: React.FC<{ indices: string[] }> = ({ indices }) => {
   );
 };
 
-const jumpToIndex = (key: string) => (e: React.MouseEvent) => {
-  const elem = e.target as HTMLElement;
-  activateRipple(elem, () => {});
-  const tunesContainer = elem
-    .closest("#album_tune_list")
-    .querySelector("#album_container_tunes");
-  const label = tunesContainer.querySelector(
-    `.section_label[data-anchor=${key}]`
-  );
-  let target = label;
-  for (let i = 0; i < 2 && target.previousElementSibling; i++) {
-    target = target.previousElementSibling;
-  }
+const jumpToIndex = (key: string) =>
+  (e: React.MouseEvent) => {
+    const elem = e.target as HTMLElement;
+    activateRipple(elem, () => {});
+    const tunesContainer = elem
+      .closest("#album_tune_list")
+      .querySelector("#album_container_tunes");
+    const label = tunesContainer.querySelector(
+      `.section_label[data-anchor=${key}]`,
+    );
+    let target = label;
+    for (let i = 0; i < 2 && target.previousElementSibling; i++) {
+      target = target.previousElementSibling;
+    }
 
-  target.scrollIntoView({
-    block: "start",
-    behavior: "smooth",
-  });
-};
+    target.scrollIntoView({
+      block: "start",
+      behavior: "smooth",
+    });
+  };
 
 const RenderListItems: React.FC<{ tunesIndexed: IndexedTunes }> = ({
   tunesIndexed,

@@ -1,7 +1,7 @@
 import { Tune } from "../scripts/tune";
 import { scoreManager } from "../scripts/store";
 // import { openNextTune } from "../scripts/router";
-import { loadingSpinner } from "./commons/load_spinner";
+import { LoadingSpinner } from "./commons/LoadingSpinner";
 import { run, throttled } from "../scripts/util/lazy";
 import { BaseProperty } from "hojoki";
 import { diff, getClientPos } from "../scripts/util/vec2";
