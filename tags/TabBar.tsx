@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { atom, useRecoilState, useRecoilValue } from "recoil";
 import {
   useCurrentAlbumId,
@@ -12,7 +12,6 @@ import { activateRipple } from "./commons/ripple";
 import { Arrow, Cross, Hanburger, Tabs } from "./icon/Icons";
 import { albumTuneListR } from "./MainView";
 import { pushToArray, findById } from "../scripts/util/immut";
-import { createPortal } from "react-dom";
 import { MbTabList, tabListOpenR as mbTabListOpenR } from "./MbTabList";
 import { useSetRecoilState } from "recoil";
 
@@ -40,11 +39,31 @@ function useOpenScores() {
   return scoresOpen;
 }
 
+export function useCloseScore() {
+  const [scoresOpen, setScoresOpen] = useRecoilState(scoresOpenR);
+  const [q] = useQueryParam();
+  const h = useHistory();
+  return (id: string) => {
+    const tuneIdx = scoresOpen.findIndex((t) => t.id === id);
+    const arr = [...scoresOpen];
+    arr.splice(tuneIdx, 1);
+    const nextTune = arr.length === 0 ? null : arr[(tuneIdx - 1) % arr.length];
+    const backUrl = q.has("album") ? `/view?album=${q.get("album")}` : "/";
+    const url = !nextTune
+      ? backUrl
+      : `/view?score=${nextTune.id}` +
+        (q.has("album") ? `&album=${q.get("album")}` : "");
+    h.push(url);
+    setScoresOpen(arr);
+  };
+}
+
 export const TabBar: React.FC<{ albumName: string }> = ({ albumName }) => {
   const setTabListOpen = useSetRecoilState(mbTabListOpenR);
   const scoresOpen = useOpenScores();
   const currentAlbumId = useCurrentAlbumId();
   const currentScoreId = useCurrentScoreId();
+  const closeScore = useCloseScore();
 
   function onTabListOpen(e: React.MouseEvent<HTMLDivElement>) {
     // activateRipple(e.currentTarget, () => {
@@ -60,9 +79,9 @@ export const TabBar: React.FC<{ albumName: string }> = ({ albumName }) => {
         {scoresOpen.map((tune) => (
           <TuneTab
             tune={tune}
-            key={tune.id}
             album={currentAlbumId}
-            viewed={currentScoreId === tune.id}
+            viewed={tune.id === currentScoreId}
+            onCloseScore={closeScore}
           />
         ))}
       </div>
@@ -115,10 +134,18 @@ const MenuOpenButton: React.FC = () => {
   );
 };
 
-const TuneTab: React.FC<{ tune: Tune; album: string; viewed: boolean }> = ({
+interface TuneTabProps {
+  tune: Tune;
+  album: string;
+  viewed: boolean;
+  onCloseScore: (id: string) => void;
+}
+
+const TuneTab: React.FC<TuneTabProps> = ({
   tune,
   album,
   viewed,
+  onCloseScore,
 }) => {
   return (
     <Link
@@ -127,7 +154,14 @@ const TuneTab: React.FC<{ tune: Tune; album: string; viewed: boolean }> = ({
       data-active={viewed}
     >
       <div className="tab_name">{tune.name}</div>
-      <div className="tab_close">
+      <div
+        className="tab_close"
+        onClick={(e) => {
+          onCloseScore(tune.id);
+          e.stopPropagation();
+          e.preventDefault();
+        }}
+      >
         <Cross />
       </div>
     </Link>
