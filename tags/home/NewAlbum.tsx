@@ -46,7 +46,6 @@ export const NewAlbum: React.FC = () => {
       gdrive_id: { value: string };
     };
     const value = decodeURIComponent(target.gdrive_id.value);
-    console.log(`value = ${value}`);
     e.preventDefault();
     confirmedId(value).then(
       (id) => {

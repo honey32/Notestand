@@ -25,7 +25,6 @@ const App: React.FC<{}> = () => {
               <MainView />
             </Route>
             <Route exact path="/">
-              <Link to="/view/">Link</Link>
               <Home />
             </Route>
           </Switch>

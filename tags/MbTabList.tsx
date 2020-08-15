@@ -22,7 +22,6 @@ export const MbTabList: React.FC<{ scores: Tune[] }> = ({ scores }) => {
     (e) => {
       const elem = e.target as HTMLElement;
       if (!elem.closest(".mob_tab_list, .mob_tablist_open_button")) {
-        console.log("close");
         setTabListOpen(false);
       }
     },

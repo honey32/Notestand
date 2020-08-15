@@ -36,7 +36,6 @@ function useTuneList() {
   useEffect(() => {
     if (!currentAlbumId) return;
     run(async () => {
-      console.log("start loading");
       setLoading(true);
       const kanjiHint = getAlbumKanjiHint(currentAlbumId);
       const tunes = DAO.lookupTunesInAlbum(currentAlbumId);
