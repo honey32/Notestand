@@ -7,10 +7,12 @@ export function wait(ms: number): Promise<void> {
 }
 
 export function waitLowPriority(ms_fallback: number = 4000): Promise<void> {
+  // @ts-ignore
   return window.requestIdleCallback
     ? new Promise((resolve, reject) => {
-      window.requestIdleCallback(() => resolve());
-    })
+        // @ts-ignore
+        window.requestIdleCallback(() => resolve());
+      })
     : wait(ms_fallback);
 }
 
@@ -20,7 +22,7 @@ export function run<A>(fn: () => A): A {
 
 export function throttled<Args extends any[], R>(
   fn: (...args: any[]) => R,
-  spanMs: number,
+  spanMs: number
 ) {
   const now = () => new Date().getTime();
   const time = now();
