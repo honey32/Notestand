@@ -1,62 +1,15 @@
 import * as React from "react";
-import { useEffect, useState } from "react";
-import { Link, useHistory } from "react-router-dom";
-import { atom, useRecoilState, useRecoilValue } from "recoil";
+import { Link } from "react-router-dom";
+import { useSetRecoilState } from "recoil";
+import { useCloseScore, useOpenScores } from "../scripts/scores";
 import {
   useCurrentAlbumId,
   useCurrentScoreId,
   useQueryParam,
 } from "../scripts/state";
 import { Tune } from "../scripts/tune";
-import { activateRipple } from "./commons/ripple";
 import { Arrow, Cross, Hanburger, Tabs } from "./icon/Icons";
-import { albumTuneListR } from "./MainView";
-import { pushToArray, findById } from "../scripts/util/immut";
 import { MbTabList, tabListOpenR as mbTabListOpenR } from "./MbTabList";
-import { useSetRecoilState } from "recoil";
-
-const scoresOpenR = atom<Tune[]>({
-  key: "scores/open",
-  default: [],
-});
-
-function useOpenScores() {
-  const [scoresOpen, setScoresOpen] = useRecoilState(scoresOpenR);
-  const s = useCurrentScoreId();
-  const a = useCurrentAlbumId();
-  const tuneList = useRecoilValue(albumTuneListR);
-
-  useEffect(() => {
-    setScoresOpen([]);
-  }, [a]);
-
-  useEffect(() => {
-    const newScore = findById(Array.from(tuneList.getTunesSorted()), s);
-    if (!newScore) return;
-    if (findById(scoresOpen, s)) return;
-    setScoresOpen(pushToArray(newScore));
-  }, [s, tuneList]);
-  return scoresOpen;
-}
-
-export function useCloseScore() {
-  const [scoresOpen, setScoresOpen] = useRecoilState(scoresOpenR);
-  const [q] = useQueryParam();
-  const h = useHistory();
-  return (id: string) => {
-    const tuneIdx = scoresOpen.findIndex((t) => t.id === id);
-    const arr = [...scoresOpen];
-    arr.splice(tuneIdx, 1);
-    const nextTune = arr.length === 0 ? null : arr[(tuneIdx - 1) % arr.length];
-    const backUrl = q.has("album") ? `/view?album=${q.get("album")}` : "/";
-    const url = !nextTune
-      ? backUrl
-      : `/view?score=${nextTune.id}` +
-        (q.has("album") ? `&album=${q.get("album")}` : "");
-    h.push(url);
-    setScoresOpen(arr);
-  };
-}
 
 export const TabBar: React.FC<{ albumName: string }> = ({ albumName }) => {
   const setTabListOpen = useSetRecoilState(mbTabListOpenR);

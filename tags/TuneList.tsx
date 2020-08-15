@@ -1,18 +1,15 @@
 import * as React from "react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { useRecoilState, RecoilRoot } from "recoil";
-import { DAO } from "../scripts/dao/dao";
+import { useTuneList } from "../scripts/album_tunes";
 import { useLocale } from "../scripts/i18n";
-import { getAlbumKanjiHint, IndexedTunes } from "../scripts/search";
+import { IndexedTunes } from "../scripts/search";
 import { useCurrentAlbumId, useQueryParam } from "../scripts/state";
 import { Tune } from "../scripts/tune";
-import { run } from "../scripts/util/lazy";
+import { LoadingSpinner } from "./commons/LoadingSpinner";
 import { activateRipple } from "./commons/ripple";
 import { SignInButton } from "./home/AccountInfo";
-import { albumTuneListR } from "./MainView";
 import { Ctxmenu } from "./menubar";
-import { LoadingSpinner } from "./commons/LoadingSpinner";
 
 type TuneId = string;
 
@@ -28,24 +25,6 @@ type TuneId = string;
 //     scrollValue = scrollOriginElement.scrollTop;
 //   }
 // });
-
-function useTuneList() {
-  const currentAlbumId = useCurrentAlbumId();
-  const [tunes, setTunes] = useRecoilState<IndexedTunes>(albumTuneListR);
-  const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    if (!currentAlbumId) return;
-    run(async () => {
-      setLoading(true);
-      const kanjiHint = getAlbumKanjiHint(currentAlbumId);
-      const tunes = DAO.lookupTunesInAlbum(currentAlbumId);
-      const indexed = (await kanjiHint).indexTunes(await tunes);
-      setLoading(false);
-      setTunes(indexed);
-    });
-  }, [currentAlbumId]);
-  return { loading, tunes, indices: tunes.indices };
-}
 
 export const TuneList: React.FC = () => {
   const [scrollValue, setScrollValue] = useState(0);

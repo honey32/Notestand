@@ -3,9 +3,8 @@ import { useCallback, useEffect, useState } from "react";
 import { Album } from "../scripts/album";
 import { DAO } from "../scripts/dao/dao";
 import { MessageAsset, useLocale } from "../scripts/i18n";
-import { showToast } from "../scripts/logic";
 import { useQueryParam } from "../scripts/state";
-import { theme, Theme } from "../scripts/store";
+import { Theme } from "../scripts/store";
 import { Tune } from "../scripts/tune";
 import { activateRipple } from "./commons/ripple";
 import { Cross } from "./icon/icons";
@@ -54,15 +53,15 @@ export const Menubar: React.FC = () => {
     activateRipple(e.target as HTMLElement, () => {
       let value: Theme;
 
-      switch (theme.value) {
-        case "blight":
-          value = "dark";
-          break;
-        default:
-          value = "blight";
-      }
+      // switch (theme.value) {
+      //       case "blight":
+      //         value = "dark";
+      //         break;
+      //       default:
+      //         value = "blight";
+      //     }
 
-      theme.value = value;
+      //     theme.value = value;
     });
   }
 
@@ -70,7 +69,7 @@ export const Menubar: React.FC = () => {
     activateRipple(e.target as HTMLElement, () => {
       if (navigator.clipboard) {
         navigator.clipboard.writeText(document.URL);
-        showToast(i18n.menu.toastCopiedCurrentUrl);
+        // showToast(i18n.menu.toastCopiedCurrentUrl);
       }
     });
   }

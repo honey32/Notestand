@@ -7,8 +7,6 @@ import { useEffect, useState } from "react";
 import { run } from "../scripts/util/lazy";
 import { DAO } from "../scripts/dao/dao";
 import { Album } from "../scripts/album";
-import { atom } from "recoil";
-import { IndexedTunes } from "../scripts/search";
 
 function useSavedAlbumName() {
   const currentAlbumId = useCurrentAlbumId();
@@ -24,11 +22,6 @@ function useSavedAlbumName() {
   }, [currentAlbumId]);
   return name;
 }
-
-export const albumTuneListR = atom<IndexedTunes>({
-  key: "albumTuneList",
-  default: new IndexedTunes(),
-});
 
 export const MainView: React.FC = () => {
   const name = useSavedAlbumName();

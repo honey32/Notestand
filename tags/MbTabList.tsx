@@ -7,7 +7,7 @@ import { atom } from "recoil";
 import { useRecoilState } from "recoil";
 import { Link, useHistory } from "react-router-dom";
 import { useQueryParam } from "../scripts/state";
-import { useCloseScore } from "./TabBar";
+import { useCloseScore } from "../scripts/scores";
 
 export const tabListOpenR = atom<boolean>({
   key: "mobile_tablist_open",
