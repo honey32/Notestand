@@ -3,14 +3,23 @@ import { useEffect, useState } from "react";
 import { Tune } from "../scripts/tune";
 import { Cross } from "./icon/icons";
 import { useGlobalEventListener } from "./utils";
+import { atom } from "recoil";
+import { useRecoilState } from "recoil";
+
+export const tabListOpenR = atom<boolean>({
+  key: "mobile_tablist_open",
+  default: false,
+});
 
 export const MbTabList: React.FC<{ scores: Tune[] }> = ({ scores }) => {
-  const [isTabListOpen, setTabListOpen] = useState<boolean>(false);
+  const [isTabListOpen, setTabListOpen] = useRecoilState(tabListOpenR);
   useGlobalEventListener(
     document,
     "click",
     (e) => {
-      if (!(e.target as HTMLElement).closest(".mob_tab_list")) {
+      const elem = e.target as HTMLElement;
+      if (!elem.closest(".mob_tab_list, .mob_tablist_open_button")) {
+        console.log("close");
         setTabListOpen(false);
       }
     },

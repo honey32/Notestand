@@ -12,6 +12,9 @@ import { activateRipple } from "./commons/ripple";
 import { Arrow, Cross, Hanburger, Tabs } from "./icon/Icons";
 import { albumTuneListR } from "./MainView";
 import { pushToArray, findById } from "../scripts/util/immut";
+import { createPortal } from "react-dom";
+import { MbTabList, tabListOpenR as mbTabListOpenR } from "./MbTabList";
+import { useSetRecoilState } from "recoil";
 
 const scoresOpenR = atom<Tune[]>({
   key: "scores/open",
@@ -38,15 +41,15 @@ function useOpenScores() {
 }
 
 export const TabBar: React.FC<{ albumName: string }> = ({ albumName }) => {
-  const [isTabListOpen, setTabListOpen] = useState(false);
+  const setTabListOpen = useSetRecoilState(mbTabListOpenR);
   const scoresOpen = useOpenScores();
   const currentAlbumId = useCurrentAlbumId();
   const currentScoreId = useCurrentScoreId();
 
   function onTabListOpen(e: React.MouseEvent<HTMLDivElement>) {
-    activateRipple(e.currentTarget, () => {
-      setTabListOpen(true);
-    });
+    // activateRipple(e.currentTarget, () => {
+    setTabListOpen((v) => !v);
+    // });
   }
 
   return (
@@ -70,6 +73,7 @@ export const TabBar: React.FC<{ albumName: string }> = ({ albumName }) => {
       >
         <Tabs />
       </div>
+      <MbTabList scores={scoresOpen} />
       <MenuOpenButton />
     </div>
   );
