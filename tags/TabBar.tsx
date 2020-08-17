@@ -31,6 +31,7 @@ export const TabBar: React.FC<{ albumName: string }> = ({ albumName }) => {
       <div className="tab_tune_container">
         {scoresOpen.map((tune) => (
           <TuneTab
+            key={tune.id}
             tune={tune}
             album={currentAlbumId}
             viewed={tune.id === currentScoreId}
