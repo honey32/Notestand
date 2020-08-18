@@ -54,7 +54,7 @@ export const TabBar: React.FC<{ albumName: string }> = ({ albumName }) => {
 
 const BackButton: React.FC = () => {
   const [q, err] = useQueryParam();
-  const shouldBackToHome = err ? true : !q.has("score") || !q.has("album");
+  const shouldBackToHome = !!err || !q.has("score") || !q.has("album");
   const backUrl = shouldBackToHome ? "/" : `/view?album=${q.get("album")}`;
 
   return (
