@@ -7,7 +7,7 @@ import { DAO } from "./dao/dao";
 
 export const albumTuneListR = atom<IndexedTunes>({
   key: "albumTuneList",
-  default: new IndexedTunes(),
+  default: IndexedTunes.Nullish(),
 });
 
 export function useTuneList() {
@@ -15,7 +15,10 @@ export function useTuneList() {
   const [tunes, setTunes] = useRecoilState<IndexedTunes>(albumTuneListR);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
-    if (!currentAlbumId) return;
+    if (!currentAlbumId) {
+      setTunes(IndexedTunes.Nullish());
+      return;
+    }
     run(async () => {
       setLoading(true);
       const kanjiHint = getAlbumKanjiHint(currentAlbumId);
