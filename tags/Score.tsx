@@ -4,8 +4,8 @@ import { getPages } from "../scripts/pdf/pdfhelper";
 import { useCurrentScoreId, useQueryParam } from "../scripts/state";
 import {
   pushAtIndex,
-  pushToArray,
   removeFromArray,
+  pushSafelyToArray,
 } from "../scripts/util/immut";
 import { run } from "../scripts/util/lazy";
 import { diff, getClientPos } from "../scripts/util/vec2";
@@ -27,7 +27,7 @@ function useLoadingStates() {
   return {
     value,
     startLoading(id: string) {
-      setLoading(pushToArray(id));
+      setLoading(pushSafelyToArray(id));
     },
     finishLoading(id: string) {
       setLoading(removeFromArray(id));
@@ -56,7 +56,7 @@ function useLoadingManager() {
   }, [score]);
   return {
     scores: Object.entries(scoreFiles).map(
-      ([k, v]) => [k, v, isLoading(k)] as const
+      ([k, v]) => [k, v, isLoading(k)] as const,
     ),
   };
 }
@@ -123,7 +123,8 @@ const Score: React.FC<ScoreProps> = ({ tuneId, shown, rp, loading }) => {
           dangerouslySetInnerHTML={{
             __html: page,
           }}
-        ></div>
+        >
+        </div>
       ))}
     </div>
   );

@@ -19,12 +19,22 @@ export function removeFromArray<V>(value: V) {
   };
 }
 
-export function pushToArray<V>(...value: V[]) {
-  return function (arr: V[]) {
-    return [...arr, ...value];
-  };
+export function pushSafelyToArray<V>(value: V, idKey?: keyof V) {
+  const idPred = !idKey
+    ? (v: V) => v === value
+    : (v: V) => v[idKey] === value[idKey];
+  return (arr: V[]) => (arr.find(idPred)) ? arr : [...arr, value];
 }
 
 export function findById<V extends { id: string }>(arr: V[], id: string) {
   return arr.find((v) => v.id === id);
+}
+
+export function findByKey<T, K extends keyof T>(
+  arr: Iterable<T>,
+  key: K,
+  value: T[K],
+) {
+  const _arr = Array.isArray(arr) ? arr : Array.from(arr);
+  return _arr.find((v) => v[key] === value);
 }

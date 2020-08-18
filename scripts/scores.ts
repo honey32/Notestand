@@ -1,7 +1,7 @@
 import { atom, useRecoilState, useRecoilValue } from "recoil";
 import { useCurrentScoreId, useCurrentAlbumId, useQueryParam } from "./state";
 import { useEffect } from "react";
-import { findById, pushToArray, findByKey } from "./util/immut";
+import { findByKey, pushSafelyToArray } from "./util/immut";
 import { useHistory } from "react-router-dom";
 import { Tune } from "./tune";
 import { albumTuneListR } from "./album_tunes";
@@ -32,10 +32,10 @@ export function useOpenScores() {
     run(async () => {
       const newScore = (s && tuneList.isEmpty)
         ? await getTuneDirectly(s)
-        : findById(Array.from(tuneList.getTunesSorted()), s);
+        : findByKey(tuneList.getTunesSorted(), "id", s);
       if (!newScore) return;
-      if (findById(scoresOpen, s)) return;
-      setScoresOpen(pushToArray(newScore));
+      if (findByKey(scoresOpen, "id", s)) return;
+      setScoresOpen(pushSafelyToArray(newScore, "id"));
     });
   }, [s, tuneList]);
   return scoresOpen;
