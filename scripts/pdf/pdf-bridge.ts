@@ -27,7 +27,11 @@ type SVGGraphics = {
 const SVGGraphics: SVGGraphicsCtor = pdfjs.SVGGraphics;
 
 export async function getDocument(arr: Uint8Array) {
-  return pdfjs.getDocument(arr).promise;
+  return pdfjs.getDocument({
+    data: arr,
+    cMapUrl: "/app/cmaps/",
+    cMapPacked: true,
+  }).promise;
 }
 
 export async function renderPdfPageAsSVG(
@@ -35,11 +39,11 @@ export async function renderPdfPageAsSVG(
   option: ViewportParameters = { scale: 1, rotation: 0 }
 ): Promise<SVGElement> {
   // @ts-ignore
-  const opList = page.getOperatorList();
+  const opList = await page.getOperatorList();
   const viewport = page.getViewport(option);
   // @ts-ignore
   const svggfx = new SVGGraphics(page.commonObjs, page.objs);
-  return svggfx.getSVG(await opList, viewport);
+  return svggfx.getSVG(opList, viewport);
 }
 
 export async function forEachPages<R>(

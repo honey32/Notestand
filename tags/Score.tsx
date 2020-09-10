@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { getPages } from "../scripts/pdf/pdfhelper";
+import { Document, Page } from "react-pdf/dist/umd/entry.parcel";
 import { useCurrentScoreId, useQueryParam } from "../scripts/state";
 import {
   pushAtIndex,
@@ -11,6 +11,7 @@ import { run } from "../scripts/util/lazy";
 import { diff, getClientPos } from "../scripts/util/vec2";
 // import { openNextTune } from "../scripts/router";
 import { LoadingSpinner } from "./commons/LoadingSpinner";
+import { DAO } from "../scripts/dao/dao";
 
 function useScorePages() {
   const [scoreFiles, setScoreFiles] = useState<Record<string, string[]>>({});
@@ -43,20 +44,20 @@ function useLoadingManager() {
   const score = useCurrentScoreId();
   useEffect(() => {
     if (!score || Object.keys(scoreFiles).includes(score)) return;
-    const process = getPages(score);
+    // const process = getPages(score);
     startLoading(score);
     yieldPage(score, undefined);
     run(async () => {
-      for (const p of await process) {
-        const html = (await p).outerHTML;
-        yieldPage(score, html);
-      }
-      finishLoading(score);
+      // for (const p of await process) {
+      //   const html = (await p).outerHTML;
+      //   yieldPage(score, html);
+      // }
+      // finishLoading(score);
     });
   }, [score]);
   return {
     scores: Object.entries(scoreFiles).map(
-      ([k, v]) => [k, v, isLoading(k)] as const,
+      ([k, v]) => [k, v, isLoading(k)] as const
     ),
   };
 }
@@ -76,13 +77,7 @@ export const Scores: React.FC = () => {
   return (
     <div id="scores_container" hidden={!q.has("score")}>
       {scores.map(([tune, rp, loading]) => (
-        <Score
-          key={tune}
-          tuneId={tune}
-          shown={isScoreShown(tune)}
-          rp={rp}
-          loading={loading}
-        />
+        <Score key={tune} tuneId={tune} shown={isScoreShown(tune)} />
       ))}
       <PopupMessage msg={msg} />
     </div>
@@ -100,35 +95,65 @@ const PopupMessage: React.FC<{ msg: string }> = ({ msg }) => {
 type ScoreProps = {
   tuneId: string;
   shown: boolean;
-  rp: string[];
-  loading: boolean;
 };
-const Score: React.FC<ScoreProps> = ({ tuneId, shown, rp, loading }) => {
+const Score: React.FC<ScoreProps> = ({ tuneId, shown }) => {
   return (
     <div
       className="score"
-      key={tuneId}
-      // afterCreate: setRenderingHook
       // onTouchstart={touchStart}
       // onTouchmove={handleOverSwipe}
       hidden={!shown}
     >
-      <div className="score_loading_spinner_wrapper" hidden={!loading}>
-        <LoadingSpinner />
-      </div>
-      {rp.map((page, idx) => (
-        <div
-          key={idx}
-          className="svg_wrapper"
-          dangerouslySetInnerHTML={{
-            __html: page,
-          }}
-        >
-        </div>
-      ))}
+      <ScoreContents tuneId={tuneId} />
     </div>
   );
 };
+
+function useScore(tuneId: string) {
+  const [data, setData] = useState<Uint8Array>(null);
+  const [numPages, setNumPages] = useState(0);
+  const [completed, setCompleted] = useState(false);
+  useEffect(() => {
+    run(async () => {
+      setData(await DAO.getTuneContent(tuneId));
+    });
+  }, [tuneId]);
+  const onLoadSuccess = ({ numPages }: { numPages: number }) => {
+    setCompleted(true);
+    setNumPages(numPages);
+  };
+  function* range() {
+    for (let i = 0; i < numPages; i++) {
+      yield i + 1;
+    }
+  }
+  const pages = Array.from(range());
+  return { data, pages, completed, onLoadSuccess };
+}
+
+const ScoreContents = React.memo<{ tuneId: string }>(({ tuneId }) => {
+  const { data, pages, completed, onLoadSuccess } = useScore(tuneId);
+  return (
+    <>
+      <div className="score_loading_spinner_wrapper" hidden={completed}>
+        <LoadingSpinner />
+      </div>
+      {data ? (
+        <Document
+          file={{ data }}
+          onLoadSuccess={onLoadSuccess}
+          renderMode="svg"
+        >
+          {pages.map((i) => (
+            <Page key={i} pageNumber={i} />
+          ))}
+        </Document>
+      ) : (
+        <></>
+      )}
+    </>
+  );
+});
 
 // async function setRenderingHook(this: Tune, elem: Element) {
 //   elem.addEventListener("touchstart", touchStart);
