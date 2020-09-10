@@ -1,83 +1,24 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { Document, Page } from "react-pdf/dist/umd/entry.parcel";
-import { useCurrentScoreId, useQueryParam } from "../scripts/state";
-import {
-  pushAtIndex,
-  removeFromArray,
-  pushSafelyToArray,
-} from "../scripts/util/immut";
+import { useQueryParam } from "../scripts/state";
 import { run } from "../scripts/util/lazy";
 import { diff, getClientPos } from "../scripts/util/vec2";
 // import { openNextTune } from "../scripts/router";
 import { LoadingSpinner } from "./commons/LoadingSpinner";
 import { DAO } from "../scripts/dao/dao";
-
-function useScorePages() {
-  const [scoreFiles, setScoreFiles] = useState<Record<string, string[]>>({});
-  return {
-    scoreFiles,
-    yieldPage(scoreId: string, value?: string) {
-      setScoreFiles(pushAtIndex(scoreId, value));
-    },
-  };
-}
-
-function useLoadingStates() {
-  const [value, setLoading] = useState<string[]>([]);
-  return {
-    value,
-    startLoading(id: string) {
-      setLoading(pushSafelyToArray(id));
-    },
-    finishLoading(id: string) {
-      setLoading(removeFromArray(id));
-    },
-    isLoading(id: string) {
-      return value.includes(id);
-    },
-  };
-}
-function useLoadingManager() {
-  const { scoreFiles, yieldPage } = useScorePages();
-  const { startLoading, finishLoading, isLoading } = useLoadingStates();
-  const score = useCurrentScoreId();
-  useEffect(() => {
-    if (!score || Object.keys(scoreFiles).includes(score)) return;
-    // const process = getPages(score);
-    startLoading(score);
-    yieldPage(score, undefined);
-    run(async () => {
-      // for (const p of await process) {
-      //   const html = (await p).outerHTML;
-      //   yieldPage(score, html);
-      // }
-      // finishLoading(score);
-    });
-  }, [score]);
-  return {
-    scores: Object.entries(scoreFiles).map(
-      ([k, v]) => [k, v, isLoading(k)] as const
-    ),
-  };
-}
+import { useOpenScores } from "../scripts/scores";
 
 export const Scores: React.FC = () => {
   const [msg, setMsg] = useState<string>("");
   const [q] = useQueryParam();
-  const { scores } = useLoadingManager();
-  const [n, updator] = useState(0);
-  useEffect(() => {
-    setTimeout(() => {
-      updator((v) => v + 1);
-    }, 1000);
-  }, [n]);
+  const scores = useOpenScores();
   const isScoreShown = (id: string) => q.get("score") === id;
 
   return (
     <div id="scores_container" hidden={!q.has("score")}>
-      {scores.map(([tune, rp, loading]) => (
-        <Score key={tune} tuneId={tune} shown={isScoreShown(tune)} />
+      {scores.map((tune) => (
+        <Score key={tune.id} tuneId={tune.id} shown={isScoreShown(tune.id)} />
       ))}
       <PopupMessage msg={msg} />
     </div>
