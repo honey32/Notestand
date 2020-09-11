@@ -14,9 +14,7 @@ import { MbTabList, tabListOpenR as mbTabListOpenR } from "./MbTabList";
 export const TabBar: React.FC<{ albumName: string }> = ({ albumName }) => {
   const setTabListOpen = useSetRecoilState(mbTabListOpenR);
   const scoresOpen = useOpenScores();
-  const currentAlbumId = useCurrentAlbumId();
   const currentScoreId = useCurrentScoreId();
-  const closeScore = useCloseScore();
 
   function onTabListOpen(e: React.MouseEvent<HTMLDivElement>) {
     // activateRipple(e.currentTarget, () => {
@@ -29,15 +27,10 @@ export const TabBar: React.FC<{ albumName: string }> = ({ albumName }) => {
       <BackButton />
       <AlbumNameTab albumName={albumName} />
       <div className="tab_tune_container">
-        {scoresOpen.map((tune) => (
-          <TuneTab
-            key={tune.id}
-            tune={tune}
-            album={currentAlbumId}
-            viewed={tune.id === currentScoreId}
-            onCloseScore={closeScore}
-          />
-        ))}
+        {scoresOpen.map((tune) => {
+          const viewed = tune.id === currentScoreId;
+          return <TuneTab key={tune.id} tune={tune} viewed={viewed} />;
+        })}
       </div>
       <div
         className="mob_tablist_open_button"
@@ -68,13 +61,10 @@ const AlbumNameTab: React.FC<{ albumName: string }> = ({ albumName }) => {
   const [q, err] = useQueryParam();
   const active = !err && q.has("album") && !q.has("score");
   const albumId = q.get("album");
+  const url = `/view?album=${albumId}`;
 
   return (
-    <Link
-      to={`/view?album=${albumId}`}
-      className="tab_album_name tab"
-      data-active={active}
-    >
+    <Link to={url} className="tab_album_name tab" data-active={active}>
       {albumName}
     </Link>
   );
@@ -90,32 +80,22 @@ const MenuOpenButton: React.FC = () => {
 
 interface TuneTabProps {
   tune: Tune;
-  album: string;
   viewed: boolean;
-  onCloseScore: (id: string) => void;
 }
 
-const TuneTab: React.FC<TuneTabProps> = ({
-  tune,
-  album,
-  viewed,
-  onCloseScore,
-}) => {
+const TuneTab: React.FC<TuneTabProps> = ({ tune, viewed }) => {
+  const album = useCurrentAlbumId();
+  const _closeScore = useCloseScore();
+  const closeScore = (e: React.MouseEvent) => {
+    _closeScore(tune.id);
+    e.stopPropagation();
+    e.preventDefault();
+  };
+  const url = `/view?score=${tune.id}&album=${album}`;
   return (
-    <Link
-      to={`/view?score=${tune.id}&album=${album}`}
-      className="tab tab-tune"
-      data-active={viewed}
-    >
+    <Link to={url} className="tab tab-tune" data-active={viewed}>
       <div className="tab_name">{tune.name}</div>
-      <div
-        className="tab_close"
-        onClick={(e) => {
-          onCloseScore(tune.id);
-          e.stopPropagation();
-          e.preventDefault();
-        }}
-      >
+      <div className="tab_close" onClick={closeScore}>
         <Cross />
       </div>
     </Link>

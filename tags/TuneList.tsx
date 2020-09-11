@@ -1,8 +1,8 @@
 import * as React from "react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { atom } from "recoil";
 import { useTuneList } from "../scripts/album_tunes";
-import { useLocale } from "../scripts/i18n";
 import { IndexedTunes } from "../scripts/search";
 import { useCurrentAlbumId, useQueryParam } from "../scripts/state";
 import { Tune } from "../scripts/tune";
@@ -10,8 +10,13 @@ import { LoadingSpinner } from "./commons/LoadingSpinner";
 import { activateRipple } from "./commons/ripple";
 import { SignInButton } from "./home/AccountInfo";
 import { Ctxmenu } from "./menubar";
+import { useRecoilValue } from "recoil";
 
 type TuneId = string;
+export const ctxMenuR = atom<string>({
+  default: null,
+  key: "ctxmenuOpenTune",
+});
 
 // let scrollValue = 0;
 // state.c(each2()).addEventListener(({ newValue, oldValue }) => {
@@ -76,29 +81,6 @@ const jumpToIndex = (key: string) => (e: React.MouseEvent) => {
 const RenderListItems: React.FC<{ tunesIndexed: IndexedTunes }> = ({
   tunesIndexed,
 }) => {
-  const [i18n] = useLocale();
-  const [contextOpenFor, setContextOpen] = useState<string>("");
-  const albumId = useCurrentAlbumId();
-  const ItemTune: React.FC<{ tune: Tune }> = ({ tune }) => {
-    const ctxmenuOpen = contextOpenFor === tune.id;
-    return (
-      <div className="tune">
-        <div className="tune_name">
-          <Link to={`/view?score=${tune.id}&album=${albumId}`}>
-            {tune.name}
-          </Link>
-        </div>
-        <Ctxmenu
-          item={tune}
-          shown={ctxmenuOpen}
-          onCloseCtxMenu={() => {
-            setContextOpen("");
-          }}
-          i18n={i18n}
-        />
-      </div>
-    );
-  };
   return (
     <div id="album_container_tunes">
       {Array.from(tunesIndexed).map(([index, tunes]) => (
@@ -111,6 +93,20 @@ const RenderListItems: React.FC<{ tunesIndexed: IndexedTunes }> = ({
           ))}
         </React.Fragment>
       ))}
+    </div>
+  );
+};
+
+const ItemTune: React.FC<{ tune: Tune }> = ({ tune }) => {
+  const contextOpenFor = useRecoilValue(ctxMenuR);
+  const albumId = useCurrentAlbumId();
+  const ctxmenuOpen = contextOpenFor === tune.id;
+  return (
+    <div className="tune">
+      <div className="tune_name">
+        <Link to={`/view?score=${tune.id}&album=${albumId}`}>{tune.name}</Link>
+      </div>
+      <Ctxmenu item={tune} shown={ctxmenuOpen} />
     </div>
   );
 };

@@ -9,6 +9,8 @@ import { Tune } from "../scripts/tune";
 import { activateRipple } from "./commons/ripple";
 import { Cross } from "./icon/icons";
 import { useGlobalEventListener } from "./utils";
+import { useSetRecoilState } from "recoil";
+import { ctxMenuR } from "./TuneList";
 
 export const Menubar: React.FC = () => {
   const [i18n] = useLocale();
@@ -103,14 +105,17 @@ export const Menubar: React.FC = () => {
 export const Ctxmenu: React.FC<{
   item: Album | Tune;
   shown: boolean;
-  onCloseCtxMenu: (e: React.MouseEvent) => void;
-  i18n: MessageAsset;
-}> = ({ item, shown, onCloseCtxMenu, i18n }) => {
+}> = ({ item, shown }) => {
+  const setContextMenu = useSetRecoilState(ctxMenuR);
+  const [i18n] = useLocale();
   const onOpenScoreFile = (e: React.MouseEvent) => {
     DAO.openOriginal(item);
     activateRipple(e.target as HTMLElement, () => {
       // setMenuOpen(false);
     });
+  };
+  const onCloseCtxMenu = (e) => {
+    setContextMenu("");
   };
   return (
     <div className="ctxmenu_wrap">

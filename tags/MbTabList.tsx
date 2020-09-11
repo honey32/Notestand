@@ -1,11 +1,10 @@
 import * as React from "react";
-import { useEffect, useState } from "react";
 import { Tune } from "../scripts/tune";
 import { Cross } from "./icon/icons";
 import { useGlobalEventListener } from "./utils";
 import { atom } from "recoil";
 import { useRecoilState } from "recoil";
-import { Link, useHistory } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useQueryParam } from "../scripts/state";
 import { useCloseScore } from "../scripts/scores";
 
@@ -16,8 +15,6 @@ export const tabListOpenR = atom<boolean>({
 
 export const MbTabList: React.FC<{ scores: Tune[] }> = ({ scores }) => {
   const [isTabListOpen, setTabListOpen] = useRecoilState(tabListOpenR);
-  const [q] = useQueryParam();
-  const closeScore = useCloseScore();
   useGlobalEventListener(
     document,
     "click",
@@ -30,29 +27,33 @@ export const MbTabList: React.FC<{ scores: Tune[] }> = ({ scores }) => {
     false
   );
 
-  const linkUrl = (id: string) =>
-    `/view?score=${id}` + (q.has("album") ? `&album=${q.get("album")}` : "");
-
   return (
     <div className="mob_tab_list" hidden={!isTabListOpen}>
       {scores.map((tune) => (
-        // <div className="tab" key={tune.id}>
-        <Link className="tab" key={tune.id} to={linkUrl(tune.id)}>
-          <div className="tab_name">{tune.name}</div>
-          <div
-            className="tab_close_button"
-            onClick={(e) => {
-              closeScore(tune.id);
-              e.stopPropagation();
-              e.preventDefault();
-            }}
-          >
-            <Cross />
-          </div>
-        </Link>
-        // </div>
+        <Tab key={tune.id} tune={tune} />
       ))}
     </div>
+  );
+};
+
+const Tab: React.FC<{ tune: Tune }> = ({ tune }) => {
+  const [q] = useQueryParam();
+  const _closeScore = useCloseScore();
+  const closeScore = (e: React.MouseEvent) => {
+    _closeScore(tune.id);
+    e.stopPropagation();
+    e.preventDefault();
+  };
+  const linkUrl =
+    `/view?score=${tune.id}` +
+    (q.has("album") ? `&album=${q.get("album")}` : "");
+  return (
+    <Link className="tab" key={tune.id} to={linkUrl}>
+      <div className="tab_name">{tune.name}</div>
+      <div className="tab_close_button" onClick={closeScore}>
+        <Cross />
+      </div>
+    </Link>
   );
 };
 
