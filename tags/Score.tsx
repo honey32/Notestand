@@ -8,6 +8,7 @@ import { diff, getClientPos } from "../scripts/util/vec2";
 import { LoadingSpinner } from "./commons/LoadingSpinner";
 import { DAO } from "../scripts/dao/dao";
 import { useOpenScores } from "../scripts/scores";
+import { useGlobalEventListener } from "./utils";
 
 export const Scores: React.FC = () => {
   const [msg, setMsg] = useState<string>("");
@@ -86,7 +87,11 @@ const ScoreContents = React.memo<{ tuneId: string }>(({ tuneId }) => {
           renderMode="svg"
         >
           {pages.map((i) => (
-            <Page key={i} pageNumber={i} />
+            <Page
+              key={i}
+              pageNumber={i}
+              onRenderSuccess={setPreserveAspRatio}
+            />
           ))}
         </Document>
       ) : (
@@ -95,6 +100,14 @@ const ScoreContents = React.memo<{ tuneId: string }>(({ tuneId }) => {
     </>
   );
 });
+
+function setPreserveAspRatio() {
+  for (const e of document.querySelectorAll(
+    'svg[preserveAspectRatio="none"]'
+  )) {
+    e.removeAttribute("preserveAspectRatio");
+  }
+}
 
 // async function setRenderingHook(this: Tune, elem: Element) {
 //   elem.addEventListener("touchstart", touchStart);
