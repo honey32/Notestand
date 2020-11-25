@@ -4,14 +4,17 @@ import { Document, Page } from "react-pdf/dist/umd/entry.parcel";
 import { useQueryParam } from "../scripts/state";
 import { run } from "../scripts/util/lazy";
 import { diff, getClientPos } from "../scripts/util/vec2";
-// import { openNextTune } from "../scripts/router";
 import { LoadingSpinner } from "./commons/LoadingSpinner";
 import { DAO } from "../scripts/dao/dao";
-import { useOpenScores } from "../scripts/scores";
-import { useGlobalEventListener } from "./utils";
+import {
+  useNextScore,
+  useOpenScores,
+  usePopupMessage,
+} from "../scripts/scores";
+import { useThrottle } from "../scripts/util/hooks";
 
 export const Scores: React.FC = () => {
-  const [msg, setMsg] = useState<string>("");
+  const msg = usePopupMessage();
   const [q] = useQueryParam();
   const scores = useOpenScores();
   const isScoreShown = (id: string) => q.get("score") === id;
@@ -39,11 +42,46 @@ type ScoreProps = {
   shown: boolean;
 };
 const Score: React.FC<ScoreProps> = ({ tuneId, shown }) => {
+  const [start, setStart] = useState<[number, number]>([0, 0]);
+  const [lock, setLock] = useState(false);
+  const openNextScore = useNextScore();
+
+  const touchStart = (e: React.TouchEvent) => {
+    setStart(getClientPos(e.touches[0]));
+  };
+
+  const handleOverSwipe = useThrottle((e: React.TouchEvent) => {
+    if (lock) return;
+    if (!(e.target instanceof Element)) return;
+
+    const [dx, dy] = diff(getClientPos(e.touches[0]), start);
+    const action = (ward: "forward" | "backward") => {
+      setLock(true);
+      e.stopPropagation();
+      openNextScore(tuneId, ward);
+    };
+    const nearVertical = Math.abs(dx / (dy + 0.01)) < 1.0;
+
+    if (dy > 40 && nearVertical) {
+      action("backward");
+    }
+    if (dy < -40 && nearVertical) {
+      action("forward");
+    }
+  }, 100);
+
+  const releaseLock = (e: React.TouchEvent) => {
+    e.preventDefault();
+    setLock(false);
+  };
+
   return (
     <div
       className="score"
-      // onTouchstart={touchStart}
-      // onTouchmove={handleOverSwipe}
+      onTouchStart={touchStart}
+      onTouchMove={handleOverSwipe}
+      onTouchEnd={releaseLock}
+      onTouchCancel={releaseLock}
       hidden={!shown}
     >
       <ScoreContents tuneId={tuneId} />
@@ -121,35 +159,3 @@ function setPreserveAspRatio() {
 //   }
 //   loadingManager.setLoading(this, "off");
 // }
-
-let start: [number, number] = [0, 0];
-let lock = false;
-
-function touchStart(e: TouchEvent) {
-  start = getClientPos(e.touches[0]);
-}
-
-function handleOverSwipe(e: TouchEvent) {
-  if (lock) return;
-  if (!(e.target instanceof Element)) return;
-
-  const [dx, dy] = diff(getClientPos(e.touches[0]), start);
-  const action = (ward: "forward" | "backward") => {
-    lock = true;
-    e.stopPropagation();
-    // openNextTune(ward);
-  };
-  const nearVertical = Math.abs(dx / (dy + 0.01)) < 1.0;
-
-  if (dy > 40 && nearVertical) {
-    action("backward");
-  }
-  if (dy < -40 && nearVertical) {
-    action("forward");
-  }
-}
-
-function releaseLock(e: Event) {
-  e.preventDefault();
-  lock = false;
-}
