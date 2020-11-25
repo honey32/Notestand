@@ -29,19 +29,101 @@ export const Scores: React.FC = () => {
   );
 };
 
-const PopupMessage: React.FC<{ msg: string }> = ({ msg }) => {
-  return (
-    <div className="popup_message" hidden={!msg}>
-      {msg}
-    </div>
-  );
-};
+const PopupMessage: React.FC<{ msg: string }> = ({ msg }) => (
+  <div className="popup_message" hidden={!msg}>
+    {msg}
+  </div>
+);
+
+const LoadingSpinnerWrapper: React.FC<{ hidden: boolean }> = ({ hidden }) => (
+  <div className="score_loading_spinner_wrapper" hidden={hidden}>
+    <LoadingSpinner />
+  </div>
+);
 
 type ScoreProps = {
   tuneId: string;
   shown: boolean;
 };
 const Score: React.FC<ScoreProps> = ({ tuneId, shown }) => {
+  const { data, pages, completed, onLoadSuccess } = useScore(tuneId);
+  const file = React.useMemo(() => ({ data }), [data]);
+  const renderMode = "svg";
+
+  return (
+    <Swipeable className="score" hidden={!shown} tuneId={tuneId}>
+      <LoadingSpinnerWrapper hidden={completed} />
+      {data && (
+        <MemoizedDocument
+          {...{ tuneId, file, onLoadSuccess, renderMode, pages }}
+        />
+      )}
+    </Swipeable>
+  );
+};
+
+interface DocProps {
+  tuneId: string;
+  file: { data: Uint8Array };
+  onLoadSuccess: (p: { numPages: number }) => void;
+  renderMode: "svg";
+  pages: number[];
+}
+const MemoizedDocument = React.memo<DocProps>(
+  ({ file, onLoadSuccess, renderMode, pages }) => {
+    return (
+      <Document {...{ file, onLoadSuccess, renderMode }}>
+        {pages.map((i) => (
+          <PageStyled key={i} pageNumber={i} />
+        ))}
+      </Document>
+    );
+  },
+  (p, n) =>
+    p.tuneId === n.tuneId &&
+    p.file.data === n.file.data &&
+    p.pages.length === n.pages.length
+);
+
+function useScore(tuneId: string) {
+  const [data, setData] = useState<Uint8Array>(null);
+  const [numPages, setNumPages] = useState(0);
+  const [completed, setCompleted] = useState(false);
+  useEffect(() => {
+    run(async () => {
+      setData(await DAO.getTuneContent(tuneId));
+    });
+  }, [tuneId]);
+  const onLoadSuccess = React.useCallback(
+    ({ numPages }: { numPages: number }) => {
+      setCompleted(true);
+      setNumPages(numPages);
+    },
+    []
+  );
+  function* range() {
+    for (let i = 0; i < numPages; i++) {
+      yield i + 1;
+    }
+  }
+  const pages = Array.from(range());
+  return { data, pages, completed, onLoadSuccess };
+}
+
+const PageStyled: React.FC<{ pageNumber: number }> = (props) => {
+  const setPreserveAspRatio = () => {
+    for (const e of document.querySelectorAll(
+      'svg[preserveAspectRatio="none"]'
+    )) {
+      e.removeAttribute("preserveAspectRatio");
+    }
+  };
+  return <Page {...props} onRenderSuccess={setPreserveAspRatio} />;
+};
+
+const Swipeable: React.FC<
+  React.HTMLAttributes<HTMLElement> & { tuneId: string }
+> = ({ children, tuneId, ...props }) => {
   const [start, setStart] = useState<[number, number]>([0, 0]);
   const [lock, setLock] = useState(false);
   const openNextScore = useNextScore();
@@ -77,75 +159,16 @@ const Score: React.FC<ScoreProps> = ({ tuneId, shown }) => {
 
   return (
     <div
-      className="score"
       onTouchStart={touchStart}
       onTouchMove={handleOverSwipe}
       onTouchEnd={releaseLock}
       onTouchCancel={releaseLock}
-      hidden={!shown}
+      {...props}
     >
-      <ScoreContents tuneId={tuneId} />
+      {children}
     </div>
   );
 };
-
-function useScore(tuneId: string) {
-  const [data, setData] = useState<Uint8Array>(null);
-  const [numPages, setNumPages] = useState(0);
-  const [completed, setCompleted] = useState(false);
-  useEffect(() => {
-    run(async () => {
-      setData(await DAO.getTuneContent(tuneId));
-    });
-  }, [tuneId]);
-  const onLoadSuccess = ({ numPages }: { numPages: number }) => {
-    setCompleted(true);
-    setNumPages(numPages);
-  };
-  function* range() {
-    for (let i = 0; i < numPages; i++) {
-      yield i + 1;
-    }
-  }
-  const pages = Array.from(range());
-  return { data, pages, completed, onLoadSuccess };
-}
-
-const ScoreContents = React.memo<{ tuneId: string }>(({ tuneId }) => {
-  const { data, pages, completed, onLoadSuccess } = useScore(tuneId);
-  return (
-    <>
-      <div className="score_loading_spinner_wrapper" hidden={completed}>
-        <LoadingSpinner />
-      </div>
-      {data ? (
-        <Document
-          file={{ data }}
-          onLoadSuccess={onLoadSuccess}
-          renderMode="svg"
-        >
-          {pages.map((i) => (
-            <Page
-              key={i}
-              pageNumber={i}
-              onRenderSuccess={setPreserveAspRatio}
-            />
-          ))}
-        </Document>
-      ) : (
-        <></>
-      )}
-    </>
-  );
-});
-
-function setPreserveAspRatio() {
-  for (const e of document.querySelectorAll(
-    'svg[preserveAspectRatio="none"]'
-  )) {
-    e.removeAttribute("preserveAspectRatio");
-  }
-}
 
 // async function setRenderingHook(this: Tune, elem: Element) {
 //   elem.addEventListener("touchstart", touchStart);
