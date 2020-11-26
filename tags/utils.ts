@@ -62,13 +62,13 @@ interface Global<Args extends any[]> {
 type G<D> = D extends Global<infer Args> ? Args : never;
 
 export function useGlobalEventListener<D extends Global<any[]>>(
-  doc: D,
+  doc: () => D,
   ...args: G<D>
 ) {
   useEffect(() => {
-    doc.addEventListener(...args);
+    doc().addEventListener(...args);
     return () => {
-      doc.removeEventListener(...args);
+      doc().removeEventListener(...args);
     };
   }, []);
 }

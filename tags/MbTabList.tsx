@@ -16,7 +16,7 @@ export const tabListOpenR = atom<boolean>({
 export const MbTabList: React.FC<{ scores: Tune[] }> = ({ scores }) => {
   const [isTabListOpen, setTabListOpen] = useRecoilState(tabListOpenR);
   useGlobalEventListener(
-    document,
+    () => document,
     "click",
     (e) => {
       const elem = e.target as HTMLElement;

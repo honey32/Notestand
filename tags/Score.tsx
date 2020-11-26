@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useState } from "react";
+import { useSetRecoilState } from "recoil";
 import {
   useNextScore,
   useOpenScores,
@@ -9,6 +10,7 @@ import { useQueryParam } from "../scripts/state";
 import { useThrottle } from "../scripts/util/hooks";
 import { diff, getClientPos } from "../scripts/util/vec2";
 import { LoadingSpinner } from "./commons/LoadingSpinner";
+import { tabListOpenR } from "./MbTabList";
 import { PdfDocument, useScoreLoader } from "./pdf/Document";
 
 export const Scores: React.FC = () => {
@@ -63,9 +65,11 @@ const Swipeable: React.FC<SwipeableProps> = ({
 }) => {
   const [start, setStart] = useState<[number, number]>([0, 0]);
   const [lock, setLock] = useState(false);
+  const setOpen = useSetRecoilState(tabListOpenR);
   const openNextScore = useNextScore();
 
   const touchStart = (e: React.TouchEvent) => {
+    setOpen(false);
     setStart(getClientPos(e.touches[0]));
   };
 
