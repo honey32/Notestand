@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { Document, DocumentProps, Page } from "react-pdf/dist/umd/entry.parcel";
+import { Document, Page } from "react-pdf/dist/umd/entry.parcel";
 import { DAO } from "../../scripts/dao/dao";
 import { run } from "../../scripts/util/lazy";
 
