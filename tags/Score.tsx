@@ -1,17 +1,15 @@
 import * as React from "react";
-import { useEffect, useState } from "react";
-import { Document, Page } from "react-pdf/dist/umd/entry.parcel";
-import { useQueryParam } from "../scripts/state";
-import { run } from "../scripts/util/lazy";
-import { diff, getClientPos } from "../scripts/util/vec2";
-import { LoadingSpinner } from "./commons/LoadingSpinner";
-import { DAO } from "../scripts/dao/dao";
+import { useState } from "react";
 import {
   useNextScore,
   useOpenScores,
   usePopupMessage,
 } from "../scripts/scores";
+import { useQueryParam } from "../scripts/state";
 import { useThrottle } from "../scripts/util/hooks";
+import { diff, getClientPos } from "../scripts/util/vec2";
+import { LoadingSpinner } from "./commons/LoadingSpinner";
+import { PdfDocument, useScoreLoader } from "./pdf/Document";
 
 export const Scores: React.FC = () => {
   const msg = usePopupMessage();
@@ -46,84 +44,23 @@ type ScoreProps = {
   shown: boolean;
 };
 const Score: React.FC<ScoreProps> = ({ tuneId, shown }) => {
-  const { data, pages, completed, onLoadSuccess } = useScore(tuneId);
-  const file = React.useMemo(() => ({ data }), [data]);
-  const renderMode = "svg";
+  const socreLoader = useScoreLoader(tuneId);
+  const { completed, file } = socreLoader;
 
   return (
     <Swipeable className="score" hidden={!shown} tuneId={tuneId}>
       <LoadingSpinnerWrapper hidden={completed} />
-      {data && (
-        <MemoizedDocument
-          {...{ tuneId, file, onLoadSuccess, renderMode, pages }}
-        />
-      )}
+      {file && <PdfDocument {...socreLoader} />}
     </Swipeable>
   );
 };
 
-interface DocProps {
-  tuneId: string;
-  file: { data: Uint8Array };
-  onLoadSuccess: (p: { numPages: number }) => void;
-  renderMode: "svg";
-  pages: number[];
-}
-const MemoizedDocument = React.memo<DocProps>(
-  ({ file, onLoadSuccess, renderMode, pages }) => {
-    return (
-      <Document {...{ file, onLoadSuccess, renderMode }}>
-        {pages.map((i) => (
-          <PageStyled key={i} pageNumber={i} />
-        ))}
-      </Document>
-    );
-  },
-  (p, n) =>
-    p.tuneId === n.tuneId &&
-    p.file.data === n.file.data &&
-    p.pages.length === n.pages.length
-);
-
-function useScore(tuneId: string) {
-  const [data, setData] = useState<Uint8Array>(null);
-  const [numPages, setNumPages] = useState(0);
-  const [completed, setCompleted] = useState(false);
-  useEffect(() => {
-    run(async () => {
-      setData(await DAO.getTuneContent(tuneId));
-    });
-  }, [tuneId]);
-  const onLoadSuccess = React.useCallback(
-    ({ numPages }: { numPages: number }) => {
-      setCompleted(true);
-      setNumPages(numPages);
-    },
-    []
-  );
-  function* range() {
-    for (let i = 0; i < numPages; i++) {
-      yield i + 1;
-    }
-  }
-  const pages = Array.from(range());
-  return { data, pages, completed, onLoadSuccess };
-}
-
-const PageStyled: React.FC<{ pageNumber: number }> = (props) => {
-  const setPreserveAspRatio = () => {
-    for (const e of document.querySelectorAll(
-      'svg[preserveAspectRatio="none"]'
-    )) {
-      e.removeAttribute("preserveAspectRatio");
-    }
-  };
-  return <Page {...props} onRenderSuccess={setPreserveAspRatio} />;
-};
-
-const Swipeable: React.FC<
-  React.HTMLAttributes<HTMLElement> & { tuneId: string }
-> = ({ children, tuneId, ...props }) => {
+type SwipeableProps = React.HTMLAttributes<HTMLElement> & { tuneId: string };
+const Swipeable: React.FC<SwipeableProps> = ({
+  children,
+  tuneId,
+  ...props
+}) => {
   const [start, setStart] = useState<[number, number]>([0, 0]);
   const [lock, setLock] = useState(false);
   const openNextScore = useNextScore();
@@ -137,19 +74,20 @@ const Swipeable: React.FC<
     if (!(e.target instanceof Element)) return;
 
     const [dx, dy] = diff(getClientPos(e.touches[0]), start);
-    const action = (ward: "forward" | "backward") => {
-      setLock(true);
-      e.stopPropagation();
-      openNextScore(tuneId, ward);
-    };
     const nearVertical = Math.abs(dx / (dy + 0.01)) < 1.0;
 
+    let ward: "backward" | "forward";
     if (dy > 40 && nearVertical) {
-      action("backward");
+      ward = "backward";
+    } else if (dy < -40 && nearVertical) {
+      ward = "forward";
+    } else {
+      return;
     }
-    if (dy < -40 && nearVertical) {
-      action("forward");
-    }
+
+    setLock(true);
+    e.stopPropagation();
+    openNextScore(tuneId, ward);
   }, 100);
 
   const releaseLock = (e: React.TouchEvent) => {
