@@ -93,6 +93,7 @@
 
 .react-pdf__Page {
   width: 100%;
+  min-width: 100%;
   overflow: hidden;
   &__svg {
     scroll-snap-align: start;
@@ -116,8 +117,10 @@
   }
 
   @media screen and (orientation: landscape) {
+    text-align: center;
     &:not(:only-child) {
-      width: 100%;
+      width: 50%;
+      min-width: 50%;
       .react-pdf__Page__svg {
         min-width: 50%;
       }
