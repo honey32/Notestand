@@ -10,17 +10,23 @@ import {
 import { Tune } from "../scripts/tune";
 import { Arrow, Cross, Hanburger, Tabs } from "./icon/Icons";
 import { MbTabList, tabListOpenR as mbTabListOpenR } from "./MbTabList";
+import { Menubar, menuOpenR } from "./menubar";
 
 export const TabBar: React.FC<{ albumName: string }> = ({ albumName }) => {
   const setTabListOpen = useSetRecoilState(mbTabListOpenR);
   const scoresOpen = useOpenScores();
   const currentScoreId = useCurrentScoreId();
+  const openMenu = useSetRecoilState(menuOpenR);
 
   function onTabListOpen(e: React.MouseEvent<HTMLDivElement>) {
     // activateRipple(e.currentTarget, () => {
     setTabListOpen((v) => !v);
     // });
   }
+
+  const handleMenuOpenButton = () => {
+    openMenu(true);
+  };
 
   return (
     <div className="tabbar">
@@ -40,7 +46,8 @@ export const TabBar: React.FC<{ albumName: string }> = ({ albumName }) => {
         <Tabs />
       </div>
       <MbTabList scores={scoresOpen} />
-      <MenuOpenButton />
+      <MenuOpenButton onClick={handleMenuOpenButton} />
+      <Menubar />
     </div>
   );
 };
@@ -70,9 +77,9 @@ const AlbumNameTab: React.FC<{ albumName: string }> = ({ albumName }) => {
   );
 };
 
-const MenuOpenButton: React.FC = () => {
+const MenuOpenButton: React.FC<{ onClick: () => void }> = ({ ...props }) => {
   return (
-    <div className="menu-open-button">
+    <div className="menu-open-button" {...props}>
       <Hanburger />
     </div>
   );

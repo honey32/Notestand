@@ -1,29 +1,50 @@
 import * as React from "react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
+import {
+  atom,
+  useRecoilState,
+  useRecoilValueLoadable,
+  useSetRecoilState,
+} from "recoil";
 import { Album } from "../scripts/album";
 import { DAO } from "../scripts/dao/dao";
-import { MessageAsset, useLocale } from "../scripts/i18n";
+import { useLocale } from "../scripts/i18n";
 import { useQueryParam } from "../scripts/state";
 import { Theme } from "../scripts/store";
 import { Tune } from "../scripts/tune";
 import { activateRipple } from "./commons/ripple";
 import { Cross } from "./icon/icons";
-import { useGlobalEventListener } from "./utils";
-import { useSetRecoilState } from "recoil";
 import { ctxMenuR } from "./TuneList";
+import { useGlobalEventListener } from "./utils";
+
+export const menuOpenR = atom({
+  key: "menu-open",
+  default: false,
+});
+
+function useMenuOpenState(): [boolean, (b: boolean) => void, () => boolean] {
+  const [isMenuOpen, setMenuOpen] = useRecoilState(menuOpenR);
+  const isMenuOpenDyn = useRef<boolean>();
+  useEffect(() => {
+    isMenuOpenDyn.current = isMenuOpen;
+  }, [isMenuOpen]);
+  return [isMenuOpen, setMenuOpen, () => isMenuOpenDyn.current];
+}
 
 export const Menubar: React.FC = () => {
   const [i18n] = useLocale();
-  const [isMenuOpen, setMenuOpen] = useState(false);
+  const [isMenuOpen, setMenuOpen, getIsMenuOpen] = useMenuOpenState();
   const [q] = useQueryParam();
   const state = q.has("score") ? "Score" : "Album";
   const itemId = q.get("score") ?? q.get("album");
+
   useGlobalEventListener(
-    document,
+    () => document,
     "click",
     (e) => {
-      if (!(e.target as HTMLElement).closest("#menubar")) {
+      if (!(e.target as HTMLElement).closest("#menubar") && getIsMenuOpen()) {
         setMenuOpen(false);
+        e.preventDefault();
       }
     },
     false
