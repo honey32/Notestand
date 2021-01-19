@@ -104,7 +104,6 @@ export const Menubar: React.FC = () => {
       <div id="menu-close-button" onClick={onCloseMenu}>
         <Cross />
       </div>
-      ,
       <div className="menu_item" onClick={onOpenScoreFile}>
         {i18n.menu.openOriginal}
       </div>
