@@ -9,6 +9,7 @@ import {
 import { Album } from "../scripts/album";
 import { DAO } from "../scripts/dao/dao";
 import { useLocale } from "../scripts/i18n";
+import { useCloseScore } from "../scripts/scores";
 import { useQueryParam } from "../scripts/state";
 import { Theme } from "../scripts/store";
 import { Tune } from "../scripts/tune";
@@ -37,6 +38,7 @@ export const Menubar: React.FC = () => {
   const [q] = useQueryParam();
   const state = q.has("score") ? "Score" : "Album";
   const itemId = q.get("score") ?? q.get("album");
+  const closeScore = useCloseScore();
 
   useGlobalEventListener(
     () => document,
@@ -62,7 +64,7 @@ export const Menubar: React.FC = () => {
 
   function onCloseTab(e: React.MouseEvent) {
     activateRipple(e.target as HTMLElement, () => {
-      // closeTune(scoreManager.viewed.value);
+      closeScore(itemId);
     });
   }
 
