@@ -4,12 +4,16 @@ import { useState, useEffect } from "react";
 import { DAO } from "../../scripts/dao/dao";
 import { run } from "../../scripts/util/lazy";
 import * as React from "react";
+import { useCurrentAlbumId } from "../../scripts/state";
 
 export const AlbumList: React.FC = () => {
   const [recentAlbums, setRecentAlbums] = useState<Album[]>([]);
+  const currentAlbumId = useCurrentAlbumId();
+
   useEffect(() => {
     run(async () => setRecentAlbums(await DAO.loadAlbumList()));
-  }, []);
+  }, [currentAlbumId]);
+
   return (
     <div id="container_albums">
       {recentAlbums.map((album) => [

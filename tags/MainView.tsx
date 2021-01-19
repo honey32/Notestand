@@ -16,6 +16,8 @@ function useSavedAlbumName() {
       const nameGot = await DAO.getEntityName(currentAlbumId);
       setName(nameGot);
       if (await DAO.albumExists({ id: currentAlbumId })) {
+        await DAO.renameAlbum(currentAlbumId, nameGot);
+      } else {
         await DAO.addAlbum(new Album(nameGot, currentAlbumId));
       }
     });
