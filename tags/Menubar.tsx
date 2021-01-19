@@ -11,7 +11,7 @@ import { DAO } from "../scripts/dao/dao";
 import { useLocale } from "../scripts/i18n";
 import { useCloseScore } from "../scripts/scores";
 import { useQueryParam } from "../scripts/state";
-import { Theme } from "../scripts/store";
+import { useToggleTheme } from "../scripts/theme";
 import { Tune } from "../scripts/tune";
 import { activateRipple } from "./commons/ripple";
 import { Cross } from "./icon/icons";
@@ -39,6 +39,7 @@ export const Menubar: React.FC = () => {
   const state = q.has("score") ? "Score" : "Album";
   const itemId = q.get("score") ?? q.get("album");
   const closeScore = useCloseScore();
+  const toggleTheme = useToggleTheme();
 
   useGlobalEventListener(
     () => document,
@@ -76,17 +77,7 @@ export const Menubar: React.FC = () => {
 
   function onToggleTheme(e: React.MouseEvent) {
     activateRipple(e.target as HTMLElement, () => {
-      let value: Theme;
-
-      // switch (theme.value) {
-      //       case "blight":
-      //         value = "dark";
-      //         break;
-      //       default:
-      //         value = "blight";
-      //     }
-
-      //     theme.value = value;
+      toggleTheme();
     });
   }
 

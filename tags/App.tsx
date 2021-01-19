@@ -6,6 +6,7 @@ import { BrowserRouter, Link } from "react-router-dom";
 import { Route, Switch } from "react-router";
 import { MainView } from "./MainView";
 import { RecoilRoot } from "recoil";
+import { useThemeInitialization } from "../scripts/theme";
 
 const ContextWrap: React.FC = ({ children }) => {
   return (
@@ -15,20 +16,27 @@ const ContextWrap: React.FC = ({ children }) => {
   );
 };
 
+const AppContents: React.FC<{}> = () => {
+  useThemeInitialization();
+  return (
+    <BrowserRouter basename="/app">
+      <Switch>
+        <Route path="/view/">
+          <MainView />
+        </Route>
+        <Route exact path="/">
+          <Home />
+        </Route>
+      </Switch>
+    </BrowserRouter>
+  );
+};
+
 const App: React.FC<{}> = () => {
   return (
     <div>
       <ContextWrap>
-        <BrowserRouter basename="/app">
-          <Switch>
-            <Route path="/view/">
-              <MainView />
-            </Route>
-            <Route exact path="/">
-              <Home />
-            </Route>
-          </Switch>
-        </BrowserRouter>
+        <AppContents />
       </ContextWrap>
     </div>
   );

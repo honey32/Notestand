@@ -3,16 +3,6 @@
 
 // export type State = "Home" | "Album" | "Score" | "Whiteout";
 
-export type Theme = "blight" | "dark";
-// export const theme = new BaseProperty<Theme>(
-// (localStorage.getItem("ui-theme") as Theme) || "blight"
-// );
-
-// theme.addEventListener((newValue) => {
-//   document.body.dataset.uitheme = newValue;
-//   localStorage.setItem("ui-theme", newValue);
-// });
-
 // const title = Computed.create(
 //   state,
 //   albumManager.current.name,
