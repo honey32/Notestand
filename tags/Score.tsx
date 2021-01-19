@@ -1,5 +1,7 @@
+/// <reference path="../scripts/wakelock.d.ts"/>
 import * as React from "react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { useSetRecoilState } from "recoil";
 import {
   useNextScore,
@@ -13,7 +15,30 @@ import { LoadingSpinner } from "./commons/LoadingSpinner";
 import { tabListOpenR } from "./MbTabList";
 import { PdfDocument, useScoreLoader } from "./pdf/Document";
 
+function useWakeLock() {
+  const lockRef = useRef<WakeLock>();
+  const { search } = useLocation();
+  const [q] = useQueryParam();
+  useEffect(() => {
+    const score = q.get("score");
+    if (score && !lockRef.current) {
+      if ("wakeLock" in window.navigator) {
+        navigator.wakeLock.request("screen").then((wl) => {
+          console.log("locked");
+          lockRef.current = wl;
+        });
+      }
+    }
+    if (!score && lockRef.current) {
+      console.log("unlocked");
+      lockRef.current.release();
+      lockRef.current = undefined;
+    }
+  }, [search]);
+}
+
 export const Scores: React.FC = () => {
+  useWakeLock();
   const msg = usePopupMessage();
   const [q] = useQueryParam();
   const scores = useOpenScores();
