@@ -18,6 +18,19 @@ body {
     --color-ripple: #333;
     color: #ddd;
   }
+
+  &[data-uitheme="sepia"] {
+    --color-bg: #fffce8;
+    color: #504222;
+    --color-bg-hover: #f3efd6;
+    --color-ripple: #e6e1c4;
+  }
+}
+
+@mixin on-sepia-theme {
+  body[data-uitheme="sepia"] & {
+    @content;
+  }
 }
 
 @mixin on-dark-theme {

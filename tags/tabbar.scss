@@ -27,6 +27,10 @@
   @include on-dark-theme {
     background-color: #333;
   }
+
+  @include on-sepia-theme {
+    background-color: #dbd2c2;
+  }
 }
 
 @mixin tabbar-m-interaction {

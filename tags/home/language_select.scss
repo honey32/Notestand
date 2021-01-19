@@ -22,6 +22,9 @@
 
     &[data-active="false"]:hover {
       background-color: #d6d6d6;
+      @include on-sepia-theme {
+        background-color: rgba(100, 80, 0, 0.2);
+      }
     }
   }
 }

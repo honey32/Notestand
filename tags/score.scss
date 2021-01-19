@@ -33,6 +33,7 @@
   position: relative; // for offsetLeft
   flex-wrap: nowrap;
   overflow-x: scroll;
+  background-color: var(--color-bg);
 
   -ms-scroll-snap-type: proximity;
   -webkit-scroll-snap-type: proximity;
@@ -113,6 +114,10 @@
 
     @include on-dark-theme {
       filter: invert(90%);
+    }
+
+    @include on-sepia-theme {
+      filter: sepia(1);
     }
   }
 

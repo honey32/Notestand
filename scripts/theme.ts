@@ -2,7 +2,7 @@ import React from "react";
 import { useEffect } from "react";
 import { atom, useRecoilState, useSetRecoilState } from "recoil";
 
-export type Theme = "blight" | "dark";
+export type Theme = "blight" | "dark" | "sepia";
 
 const themeR = atom<Theme>({
   key: "ui_theme",
@@ -23,7 +23,8 @@ export function useThemeInitialization() {
 export function useToggleTheme() {
   const setValue = useSetRecoilState(themeR);
   const next: Record<Theme, Theme> = {
-    blight: "dark",
+    blight: "sepia",
+    sepia: "dark",
     dark: "blight",
   };
   return () => {
