@@ -1,5 +1,8 @@
 #container_albums {
   @include thin-scroll-bar;
+  & > .album {
+    padding: 0 1rem;
+  }
 
   @media screen and (min-width: 40rem) {
     display: grid;
@@ -15,6 +18,7 @@
 
 #container_albums > .album {
   @include rippleable;
+  display: block;
   font-size: 1.4rem;
   padding: 1rem;
   color: inherit;
