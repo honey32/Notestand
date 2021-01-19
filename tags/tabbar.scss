@@ -42,7 +42,7 @@
   display: flex;
   --color-ripple: var(--color-bg);
 
-  color: inherit;
+  color: inherit !important;
   text-decoration: none;
 
   @include tabbar-pc {
