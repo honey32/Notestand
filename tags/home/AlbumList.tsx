@@ -5,6 +5,7 @@ import { DAO } from "../../scripts/dao/dao";
 import { run } from "../../scripts/util/lazy";
 import * as React from "react";
 import { useCurrentAlbumId } from "../../scripts/state";
+import { Link } from "react-router-dom";
 
 export const AlbumList: React.FC = () => {
   const [recentAlbums, setRecentAlbums] = useState<Album[]>([]);
@@ -17,23 +18,14 @@ export const AlbumList: React.FC = () => {
   return (
     <div id="container_albums">
       {recentAlbums.map((album) => [
-        <div
+        <Link
+          to="/view?album=0BzegRJ-j8XE4VFZiNUpMS2NrMlU"
           className="album"
           key={album.id}
-          onClick={onclick}
-          onContextMenu={oncontextmenu}
         >
           <div className="tab_album_name">{album.name}</div>
-        </div>,
+        </Link>,
       ])}
     </div>
   );
 };
-
-function onclick(e: React.MouseEvent) {
-  activateRipple(e.target as HTMLElement, () => {
-    // router.openAlbum(this.id);
-  });
-}
-
-function oncontextmenu() {}

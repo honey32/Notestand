@@ -1,20 +1,22 @@
 #container_albums {
-    @include thin-scroll-bar;
+  @include thin-scroll-bar;
 
-    @media screen and (min-width: 40rem) {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(24rem, 1fr));
-        gap: 1rem;
-        padding: 1rem;
+  @media screen and (min-width: 40rem) {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(24rem, 1fr));
+    gap: 1rem;
+    padding: 1rem;
 
-        .album {
-            @include card;
-        }
+    .album {
+      @include card;
     }
+  }
 }
 
 #container_albums > .album {
-    @include rippleable;
-    font-size: 1.4rem;
-    padding: 1rem;
+  @include rippleable;
+  font-size: 1.4rem;
+  padding: 1rem;
+  color: inherit;
+  text-decoration: none;
 }
