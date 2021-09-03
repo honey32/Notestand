@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { atom } from "recoil";
+import { useHistory } from "react-router-dom";
+import { atom, useRecoilState } from "recoil";
 import { useTuneList } from "../scripts/album_tunes";
 import { IndexedTunes } from "../scripts/search";
 import { useCurrentAlbumId, useQueryParam } from "../scripts/state";
@@ -98,13 +98,20 @@ const RenderListItems: React.FC<{ tunesIndexed: IndexedTunes }> = ({
 };
 
 const ItemTune: React.FC<{ tune: Tune }> = ({ tune }) => {
-  const contextOpenFor = useRecoilValue(ctxMenuR);
+  const [contextOpenFor, openContextMenu] = useRecoilState(ctxMenuR);
   const albumId = useCurrentAlbumId();
   const ctxmenuOpen = contextOpenFor === tune.id;
+  const history = useHistory()
+
   return (
-    <div className="tune">
-      <div className="tune_name">
-        <Link to={`/view?score=${tune.id}&album=${albumId}`}>{tune.name}</Link>
+    <div className="tune_wrap">
+      <div 
+        className="tune" 
+        onClick={() => {history.push(`/view?score=${tune.id}&album=${albumId}`)}}
+        onContextMenu={(e) =>{ e.preventDefault(); openContextMenu(tune.id); }}>
+        <div className="tune_name">
+          {tune.name}
+        </div>
       </div>
       <Ctxmenu item={tune} shown={ctxmenuOpen} />
     </div>
