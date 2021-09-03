@@ -99,6 +99,7 @@
   &__svg {
     scroll-snap-align: start;
     display: block;
+    width: auto !important;
     height: 100% !important;
     max-width: 100%;
     margin-right: auto;
@@ -110,6 +111,8 @@
       width: auto;
       height: 100%;
       max-width: 100%;
+      display: block;
+      margin: auto;
     }
 
     @include on-dark-theme {
