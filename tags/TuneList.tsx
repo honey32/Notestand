@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { atom, useRecoilState } from "recoil";
 import { useTuneList } from "../scripts/album_tunes";
@@ -102,9 +102,33 @@ const ItemTune: React.FC<{ tune: Tune }> = ({ tune }) => {
   const albumId = useCurrentAlbumId();
   const ctxmenuOpen = contextOpenFor === tune.id;
   const history = useHistory()
+  const ref = useRef<HTMLDivElement>()
+
+  useEffect(() => {
+    const listener = (ev: MouseEvent) => {
+      const target = ev.target
+      if(target instanceof Node) {
+        if(!ref.current?.contains(target)) {
+          if(!(target instanceof Element && target.closest(".tune_wrap"))) {
+            openContextMenu(null)
+          }
+        }
+      }
+    }
+    if(ctxmenuOpen) {
+      window.addEventListener("click", listener)
+      window.addEventListener("contextmenu", listener)
+    }
+    return () => {
+      if(ctxmenuOpen) {
+        window.removeEventListener("click", listener)
+        window.removeEventListener("contextmenu", listener)
+      }
+    }
+  }, [ctxmenuOpen])
 
   return (
-    <div className="tune_wrap">
+    <div className="tune_wrap" ref={ref}>
       <div 
         className="tune" 
         onClick={() => {history.push(`/view?score=${tune.id}&album=${albumId}`)}}
