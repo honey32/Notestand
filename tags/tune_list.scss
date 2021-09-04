@@ -112,6 +112,7 @@ body {
       @include card;
       top: 60%;
       left: 16px;
+      z-index: 1;
 
       .menu_item {
         @include reveal;
@@ -153,7 +154,7 @@ body {
       @include card;
 
       .tune_name {
-        padding: 1rem;
+        padding: 1rem !important;
       }
 
       .ctxmenu {
