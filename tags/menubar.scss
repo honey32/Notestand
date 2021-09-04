@@ -5,12 +5,12 @@
   display: flex;
   flex-direction: column;
   position: fixed;
-  top: 0.2rem;
-  right: 0.2rem;
+  top: 0.5rem;
+  right: 0.5rem;
   width: 12rem;
   max-width: 100vw;
   background-color: var(--color-bg-popup);
-  box-shadow: 0 1px 12px hsla(0, 0, 0, 0.4);
+  box-shadow: 0 1px 12px hsla(0, 0, 0, 0.2);
   z-index: 20;
   border-radius: 2px;
 
