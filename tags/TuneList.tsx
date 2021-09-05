@@ -105,7 +105,7 @@ const ItemTune: React.FC<{ tune: Tune }> = ({ tune }) => {
   const ref = useRef<HTMLDivElement>()
 
   useEffect(() => {
-    const listener = (ev: MouseEvent) => {
+    const listener = (ev: MouseEvent | TouchEvent) => {
       const target = ev.target
       if(target instanceof Node) {
         if(!ref.current?.contains(target)) {
@@ -118,12 +118,14 @@ const ItemTune: React.FC<{ tune: Tune }> = ({ tune }) => {
     if(ctxmenuOpen) {
       window.addEventListener("click", listener)
       window.addEventListener("contextmenu", listener)
+      window.addEventListener("touchstart", listener)
     }
     return () => {
       if(ctxmenuOpen) {
         window.removeEventListener("click", listener)
         window.removeEventListener("contextmenu", listener)
-      }
+        window.removeEventListener("touchstart", listener)
+    }
     }
   }, [ctxmenuOpen])
 
