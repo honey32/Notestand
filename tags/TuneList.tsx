@@ -11,6 +11,7 @@ import { activateRipple } from "./commons/ripple";
 import { SignInButton } from "./home/AccountInfo";
 import { Ctxmenu } from "./menubar";
 import { useRecoilValue } from "recoil";
+import { getScrollOriginElement } from "./utils";
 
 type TuneId = string;
 export const ctxMenuR = atom<string>({
@@ -18,30 +19,75 @@ export const ctxMenuR = atom<string>({
   key: "ctxmenuOpenTune",
 });
 
-// let scrollValue = 0;
-// state.c(each2()).addEventListener(({ newValue, oldValue }) => {
-//   const scrollOriginElement = getScrollOriginElement();
-//   if (newValue === "Album") {
-//     requestAnimationFrame(() => {
-//       projector.renderNow();
-//       scrollOriginElement.scrollTop = scrollValue;
-//     });
-//   } else if (oldValue === "Album") {
-//     scrollValue = scrollOriginElement.scrollTop;
-//   }
-// });
+type AppState = "score" | "album" | "else"
+
+const useTwin = <T extends unknown>(initial: [T, T]) => {
+  const [[last, current], setTwin] = useState(initial);
+  const update = React.useCallback((next: T) => 
+    setTwin(([,current]) => [current, next])
+  ,[])
+  React.useDebugValue([last, current])
+  return [last, current, update] as const
+}
+
+const useScrollRestore = () => {
+  const [q] = useQueryParam();
+  const [last, current, update] = useTwin<AppState>(["else", "else"])
+  
+  React.useEffect(() => {
+    if(q.has("score")) {
+      update("score")
+    } else if(q.has("album")) {
+      update("album")
+    } else {
+      update("else")
+    }
+  }, [q.has("score"), q.has("album"), update])
+  
+  const scrollValue = useRef(0);
+  const id = useRef(0)
+
+  React.useLayoutEffect(() => {
+    const scrollOriginElement = getScrollOriginElement()
+    if(current === "album") {
+      const anime = () => {
+        scrollValue.current = scrollOriginElement?.scrollTop
+        id.current = requestAnimationFrame(anime)
+      }
+      setTimeout(anime, 1000)
+    }
+    return () => cancelAnimationFrame(id.current)
+  }, [current])
+
+  const cancel = React.useCallback(() => {
+    cancelAnimationFrame(id.current)
+  },[])
+
+  React.useLayoutEffect(() => {
+    const scrollOriginElement = getScrollOriginElement()
+    
+    if(last === "score" && current === "album") {
+      requestAnimationFrame(() => {
+        scrollOriginElement.scrollTop = scrollValue.current
+      })
+    }
+  }, [last, current]);
+
+  return cancel
+}
 
 export const TuneList: React.FC = () => {
-  const [scrollValue, setScrollValue] = useState(0);
-  const { loading, tunes, indices } = useTuneList();
   const [q] = useQueryParam();
+  const { loading, tunes, indices } = useTuneList();
+  const cancel = useScrollRestore();
+  
 
   return (
     <div id="album_tune_list" hidden={q.has("score") || !q.has("album")}>
       <AlbumIndicies indices={indices} />
       <SignInButton />
       {loading ? <LoadingSpinner /> : <></>}
-      <RenderListItems tunesIndexed={tunes} />
+      <RenderListItems tunesIndexed={tunes} saveScroll={cancel}/>
     </div>
   );
 };
@@ -78,8 +124,9 @@ const jumpToIndex = (key: string) => (e: React.MouseEvent) => {
   });
 };
 
-const RenderListItems: React.FC<{ tunesIndexed: IndexedTunes }> = ({
+const RenderListItems: React.FC<{ tunesIndexed: IndexedTunes, saveScroll }> = ({
   tunesIndexed,
+  saveScroll
 }) => {
   return (
     <div id="album_container_tunes">
@@ -89,7 +136,7 @@ const RenderListItems: React.FC<{ tunesIndexed: IndexedTunes }> = ({
             {index}
           </div>
           {tunes.map((tune) => (
-            <ItemTune key={tune.id} tune={tune} />
+            <ItemTune key={tune.id} tune={tune} saveScroll={saveScroll}/>
           ))}
         </React.Fragment>
       ))}
@@ -97,7 +144,7 @@ const RenderListItems: React.FC<{ tunesIndexed: IndexedTunes }> = ({
   );
 };
 
-const ItemTune: React.FC<{ tune: Tune }> = ({ tune }) => {
+const ItemTune: React.FC<{ tune: Tune, saveScroll: () => {} }> = ({ tune, saveScroll }) => {
   const [contextOpenFor, openContextMenu] = useRecoilState(ctxMenuR);
   const albumId = useCurrentAlbumId();
   const ctxmenuOpen = contextOpenFor === tune.id;
@@ -133,7 +180,10 @@ const ItemTune: React.FC<{ tune: Tune }> = ({ tune }) => {
     <div className="tune_wrap" ref={ref}>
       <div 
         className="tune" 
-        onClick={() => {history.push(`/view?score=${tune.id}&album=${albumId}`)}}
+        onClick={() => {
+          saveScroll()
+          history.push(`/view?score=${tune.id}&album=${albumId}`)
+        }}
         onContextMenu={(e) =>{ e.preventDefault(); openContextMenu(tune.id); }}>
         <div className="tune_name">
           {tune.name}
