@@ -110,15 +110,11 @@ const jumpToIndex = (key: string) => (e: React.MouseEvent) => {
   const tunesContainer = elem
     .closest("#album_tune_list")
     .querySelector("#album_container_tunes");
-  const label = tunesContainer.querySelector(
+  const target = tunesContainer.querySelector(
     `.section_label[data-anchor=${key}]`
   );
-  let target = label;
-  for (let i = 0; i < 2 && target.previousElementSibling; i++) {
-    target = target.previousElementSibling;
-  }
-
-  target.scrollIntoView({
+  
+  target?.scrollIntoView({
     block: "start",
     behavior: "smooth",
   });
