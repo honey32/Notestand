@@ -12,6 +12,7 @@ import { SignInButton } from "./home/AccountInfo";
 import { Ctxmenu } from "./menubar";
 import { useRecoilValue } from "recoil";
 import { getScrollOriginElement } from "./utils";
+import { useScrollSave } from "../scripts/useSaveScroll";
 
 type TuneId = string;
 export const ctxMenuR = atom<string>({
@@ -30,7 +31,7 @@ const useTwin = <T extends unknown>(initial: [T, T]) => {
   return [last, current, update] as const
 }
 
-const useScrollRestore = () => {
+const useTuneListScrollSave = () => {
   const [q] = useQueryParam();
   const [last, current, update] = useTwin<AppState>(["else", "else"])
   
@@ -43,43 +44,30 @@ const useScrollRestore = () => {
       update("else")
     }
   }, [q.has("score"), q.has("album"), update])
-  
-  const scrollValue = useRef(0);
-  const id = useRef(0)
+
+  const {
+    startObservation,
+    stopObservation, 
+    restore
+  } = useScrollSave()
 
   React.useLayoutEffect(() => {
-    const scrollOriginElement = getScrollOriginElement()
     if(current === "album") {
-      const anime = () => {
-        scrollValue.current = scrollOriginElement?.scrollTop
-        id.current = requestAnimationFrame(anime)
+      startObservation()
+      if(last === "score") {
+        restore()
       }
-      setTimeout(anime, 1000)
     }
-    return () => cancelAnimationFrame(id.current)
-  }, [current])
+    return () => stopObservation()
+  }, [last, current])
 
-  const cancel = React.useCallback(() => {
-    cancelAnimationFrame(id.current)
-  },[])
-
-  React.useLayoutEffect(() => {
-    const scrollOriginElement = getScrollOriginElement()
-    
-    if(last === "score" && current === "album") {
-      requestAnimationFrame(() => {
-        scrollOriginElement.scrollTop = scrollValue.current
-      })
-    }
-  }, [last, current]);
-
-  return cancel
+  return stopObservation
 }
 
 export const TuneList: React.FC = () => {
   const [q] = useQueryParam();
   const { loading, tunes, indices } = useTuneList();
-  const cancel = useScrollRestore();
+  const cancel = useTuneListScrollSave();
   
 
   return (
