@@ -1,8 +1,6 @@
 import { useLocale } from "../../scripts/i18n";
 import { GDrive, useAccount } from "../../scripts/back/gdrive";
-// import { openAlbum } from "../../scripts/router";
 import { NewAlbumDesktop } from "./NewAlbumDT";
-import { BaseProperty } from "hojoki";
 import * as React from "react";
 import { useState } from "react";
 import { useHistory } from "react-router";
