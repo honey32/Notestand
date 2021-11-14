@@ -1,150 +1,174 @@
 body {
-    @include thin-scroll-bar;
-    -webkit-overflow-scrolling: touch;
-}
-
-.tabbar {
-    position: relative;
-    z-index: 20;
+  @include thin-scroll-bar;
+  -webkit-overflow-scrolling: touch;
 }
 
 #album_indices {
-    box-shadow: 0 0 6px rgba(0,0,0, .2);
-    &:empty {
-        height: 3rem;
-    }
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
+  &:empty {
+    height: 3rem;
+  }
 }
 
 @include tabbar-mobile {
-    #album_tune_list > .tabbar {
-        box-shadow: none;
-    }    
+  #album_tune_list {
+    position: relative;
+  }
 
-    #album_indices {
-        box-shadow: 0 0 12px rgba(0,0,0, .4);
+  #album_tune_list > .tabbar {
+    box-shadow: none;
+  }
+
+  #album_tune_list > #album_indices {
+    box-shadow: none;
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    width: 3rem;
+    box-sizing: border-box;
+    justify-items: center;
+    flex-direction: column;
+
+    .album_index_jump {
+      display: block;
+      font-size: 0.75rem;
     }
+  }
 }
 
 #album_tune_list {
-    position: relative;
+  position: relative;
 
-    &.hidden {
-        display: none;
-    }
+  &.hidden {
+    display: none;
+  }
 
-    #account_info {
-        margin-top: calc(50vh - 3rem);
-    }
+  #account_info {
+    margin-top: calc(50vh - 3rem);
+  }
 
-    .tabbar {
-        height: 3rem;
-        position: sticky;
-        top: 0;
-    }
+  .tabbar {
+    height: 3rem;
+    position: sticky;
+    top: 0;
+  }
 }
 
 #album_indices {
-    position: sticky;
-    top: 3rem;
-    background-color: var(--color-bg);
-    z-index: 10;
+  position: sticky;
+  top: 3rem;
+  background-color: var(--color-bg);
+  z-index: 10;
 
-    padding-left: 0.3rem;
-    padding-right: 0.3rem;
-    white-space: nowrap;
-    overflow-x: scroll;
-    -webkit-overflow-scrolling: touch;
-    @include thin-scroll-bar;
+  padding-left: 0.3rem;
+  padding-right: 0.3rem;
+  white-space: nowrap;
+  overflow-x: scroll;
+  -webkit-overflow-scrolling: touch;
+  @include thin-scroll-bar;
 
-    @include tabbar-mobile {
-        padding-top: 0.1rem;
-    }
+  @include tabbar-mobile {
+    padding-top: 0.1rem;
+  }
 }
 
 .album_index_jump {
-    display: inline-block;
-    padding: 0.5rem;
-    line-height: 1;
-    min-width: 1rem;
-    text-align: center;
-    margin: 0.2rem 0;
-    border-radius: 50%;
-    @include reveal;
-    @include rippleable;
+  display: inline-block;
+  padding: 0.5rem;
+  line-height: 1;
+  min-width: 1rem;
+  text-align: center;
+  margin: 0.2rem 0;
+  border-radius: 50%;
+  @include reveal;
+  @include rippleable;
 }
 
 #album_container_tunes {
-    min-height: 0;
-    
-
+  min-height: 0;
+  padding-bottom: 4rem;
+  
+  .tune_wrap {
+    position: relative;
     .tune {
+      line-height: 1;
+
+      .tune_name {
+        @include rippleable;
+        padding: 0.8rem;
+        font-size: 1.2rem;
+
+        a {
+          color: inherit;
+          text-decoration: none;
+        }
+      }
+    }
+    .ctxmenu_wrap {
+      position: absolute;
+      display: flex;
+      justify-content: end;
+      padding: 0.5rem 0;
+      @include card;
+      top: 60%;
+      left: 16px;
+      z-index: 1;
+
+      .menu_item {
+        @include reveal;
+        @include rippleable;
+        padding: 0.8rem;
         line-height: 1;
 
-        .tune_name {
-            @include rippleable;
-            padding: 0.8rem;
-            font-size: 1.2rem;
+        svg.icon {
+          margin: -0.2rem;
         }
+      }
+    }
+  }
 
-        .ctxmenu {
-            display: flex;
-            justify-content: end;
-            color: var(--color-text-hint);
-            margin-bottom: 0.6rem;
-            
-            .menu_item {
-                @include reveal;
-                @include rippleable;
-                padding: 0.8rem;
-                line-height: 1;
+  .section_label {
+    scroll-margin-top: 8rem;
+    padding: 0.4rem 0 0.4rem 0.8rem;
+    font-size: 0.8rem;
+    color: #555;
+    background-color: #f8f8f8;
+    border-top: 2px solid var(--color-bg);
+    border-bottom: 2px solid var(--color-bg);
 
-                svg.icon {
-                    margin: -0.2rem;
-                }
-            }
-        }
+    @include on-dark-theme {
+      color: #ccc;
+      background-color: #222;
+    }
+  }
+
+  @include tabbar-pc {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(26rem, 1fr));
+    gap: 1rem;
+    padding: 1rem;
+    padding-bottom: 4rem;
+    background-color: rgba(0, 0, 0, 0.01);
+
+    .tune {
+      grid-column: span 1;
+      @include card;
+
+      .tune_name {
+        padding: 1rem !important;
+      }
+
+      .ctxmenu {
+        margin-bottom: 0.8rem;
+      }
     }
 
     .section_label {
-        padding: 0.4rem 0 0.4rem 0.8rem;
-        font-size: 0.8rem;
-        color: #555;
-        background-color: #f8f8f8;
-        border-top: 2px solid var(--color-bg);
-        border-bottom: 2px solid var(--color-bg);
-
-        @include on-dark-theme {
-            color: #ccc;
-            background-color: #222;
-        }
+      grid-column: 1 / -1;
+      background-color: transparent;
+      font-size: 1.4rem;
+      border: none;
+      font-weight: bold;
     }
-
-    @include tabbar-pc {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(26rem, 1fr));
-        gap: 1rem;
-        padding: 1rem;
-        background-color: rgba(0,0,0, .01);
-
-        .tune {
-            grid-column: span 1;
-            @include card;
-
-            .tune_name {
-                padding: 1rem;
-            }
-
-            .ctxmenu {
-                margin-bottom: 0.8rem;
-            }
-        }
-
-        .section_label {
-            grid-column: 1 / -1;
-            background-color: transparent;
-            font-size: 1.4rem;
-            border: none;
-            font-weight: bold;
-        }
-    }
+  }
 }

@@ -1,27 +1,30 @@
 #language_wrapper {
-    margin-top: 1rem;
-    text-align: center;
+  margin-top: 1rem;
+  text-align: center;
 }
 
 #language {
-    display: inline-flex;
+  display: inline-flex;
 
-    .selection {
-        padding: 0.5rem 1rem;
-        margin: 0 0.5rem;
-        border-radius: 2px;
+  .selection {
+    padding: 0.5rem 1rem;
+    margin: 0 0.5rem;
+    border-radius: 2px;
 
-        &:not(.active) {
-            color: #555;
-        }
-
-        &.active {
-            background-color: var(--color-accent);
-            color: white;
-        }
-
-        &:not(.active):hover {
-            background-color: #d6d6d6;
-        }
+    &:not(.active) {
+      color: #555;
     }
+
+    &[data-active="true"] {
+      background-color: var(--color-accent);
+      color: white;
+    }
+
+    &[data-active="false"]:hover {
+      background-color: #d6d6d6;
+      @include on-sepia-theme {
+        background-color: rgba(100, 80, 0, 0.2);
+      }
+    }
+  }
 }

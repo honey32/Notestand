@@ -1,48 +1,52 @@
 #home_new_album {
-    margin: 1rem auto;
-    max-width: 48rem;
-    box-sizing: border-box;
-    width: calc(100vw - 2rem);
+  margin: 1rem auto;
+  max-width: 48rem;
+  box-sizing: border-box;
+  width: calc(100vw - 2rem);
+  padding: 1rem;
+  background-color: #fafafa;
+
+  @include on-dark-theme {
+    background-color: #222;
+  }
+
+  @include on-sepia-theme {
+    background-color: rgba(100, 80, 0, 0.2);
+  }
+
+  & summary {
     padding: 1rem;
-    background-color: #fafafa;
+    margin: -1rem -1rem -1rem -1rem;
+  }
 
-    @include on-dark-theme {
-        background-color: #222;
-    }
-
-    & summary {
-        padding: 1rem;
-        margin: -1rem -1rem -1rem -1rem;
-    }
-
-    & > details[open] > summary {
-        margin: -1rem -1rem 0 -1rem;
-    }
+  & > details[open] > summary {
+    margin: -1rem -1rem 0 -1rem;
+  }
 }
 
 #home_new_album_input {
-    @include reset-style-input;
-    padding: 0.8rem;
-    border-radius: 2px;
-    display: block;
-    width: -webkit-fill-available;
-    width: available;
-    border: 1px solid #555;
-    margin: 1rem 0;
+  @include reset-style-input;
+  padding: 0.8rem;
+  border-radius: 2px;
+  display: block;
+  width: -webkit-fill-available;
+  width: available;
+  border: 1px solid #555;
+  margin: 1rem 0;
 }
 
 #home_new_album_button {
-    @include reset-style-button;
-    padding: 0.8rem;
-    background-color: #445;
-    color: #ddd;
-    display: block;
-    box-sizing: border-box;
-    width: -webkit-fill-available;
-    width: available;
-    max-width: 30rem;
+  @include reset-style-button;
+  padding: 0.8rem;
+  background-color: #445;
+  color: #ddd;
+  display: block;
+  box-sizing: border-box;
+  width: -webkit-fill-available;
+  width: available;
+  max-width: 30rem;
 
-    &:disabled {
-        opacity: 0.6;
-    }
+  &:disabled {
+    opacity: 0.6;
+  }
 }

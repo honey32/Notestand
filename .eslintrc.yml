@@ -1,0 +1,10 @@
+extends:
+  - 'plugin:prettier/recommended'
+  - 'prettier/@typescript-eslint'
+  - 'prettier/react'
+plugins:
+  - react
+  - '@typescript-eslint'
+rules: 
+  "semi": [2, always]
+  "react/prop-types": [2, { ignore: ['children'] }]
