@@ -2,7 +2,6 @@
   "name": "notestand_desktop",
   "version": "0.0.0",
   "description": "",
-  "main": "dist/index.html",
   "bin": "./public/carlo/main.js",
   "scripts": {
     "dev": "run-p serve watch",
@@ -11,7 +10,7 @@
     "deploy": "firebase deploy",
     "serve": "firebase serve",
     "prewatch": "run-s clean copyfiles",
-    "watch": "parcel watch index.html --no-hmr -d public/app --public-url /app",
+    "watch": "parcel watch index.html --no-hmr --dist-dir public/app --public-url /app",
     "prebuild": "run-s clean copyfiles",
     "build": "parcel build index.html -d public/app --public-url /app",
     "prebuild:nocache": "run-s clean copyfiles",
