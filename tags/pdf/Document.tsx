@@ -1,8 +1,18 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { Document, Page } from "react-pdf/dist/umd/entry.parcel";
+import { Document, Page } from "react-pdf";
 import { DAO } from "../../scripts/dao/dao";
 import { run } from "../../scripts/util/lazy";
+
+import * as pdfjs from "pdfjs-dist/legacy/build/pdf";
+
+// react-pdf で parcel v2 に対応していないので
+if (typeof window !== "undefined" && "Worker" in window) {
+  pdfjs.GlobalWorkerOptions.workerPort = new Worker(
+    new URL("~/node_modules/react-pdf/dist/esm/pdf.worker.entry.js", import.meta.url),
+    { type: "module" }
+  );
+}
 
 interface DocProps {
   file: { data: Uint8Array };

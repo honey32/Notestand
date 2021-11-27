@@ -49,14 +49,16 @@
     "pdfjs-dist": "^2.4.456",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-pdf": "^5.0.0",
+    "react-pdf": "^5.5.0",
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
     "recoil": "0.0.10",
     "serve-handler": "^5.0.8"
   },
   "devDependencies": {
-    "@parcel/service-worker": "^2.0.1",
+    "@parcel/packager-raw-url": "^2.0.1",
+    "@parcel/transformer-sass": "^2.0.1",
+    "@parcel/transformer-webmanifest": "^2.0.1",
     "@types/gapi.auth2": "0.0.46",
     "@types/gapi.client.drive": "^3.0.8",
     "@types/micro": "^7.3.3",

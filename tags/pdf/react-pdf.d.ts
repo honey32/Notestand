@@ -1,3 +1,3 @@
-declare module "react-pdf/dist/umd/entry.parcel" {
+declare module "react-pdf/dist/esm/entry.parcel" {
   export * from "react-pdf";
 }

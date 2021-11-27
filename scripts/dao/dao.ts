@@ -1,7 +1,6 @@
 import { Tune } from '../tune';
 import { Album } from '../album';
 import { DAO_WEB } from './dao_web';
-import { DAO_Carlo } from './dao_carlos';
 
 export interface DAO_Main {
     getKanjiHintNotation(albumId: string): Promise<string>
@@ -21,4 +20,4 @@ export interface DAO_Albums {
 
 export type DAO = DAO_Main & DAO_Albums
 
-export const DAO: DAO = (process.env.NODE_ENV === 'desktop') ? DAO_Carlo() : DAO_WEB();
+export const DAO: DAO = DAO_WEB();

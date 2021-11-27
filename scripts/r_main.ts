@@ -3,7 +3,10 @@ import "../tags/App";
 import { run } from "./util/lazy";
 
 if ("serviceWorker" in navigator && process.env.NODE_ENV !== "desktop") {
-  navigator.serviceWorker.register("/service-worker.js");
+  navigator.serviceWorker.register(
+    new URL("service-worker.js"),
+    { type: "module" }
+  );
 }
 
 run(async () => {
