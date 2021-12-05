@@ -39,6 +39,7 @@
     "> 5%"
   ],
   "dependencies": {
+    "@parcel/service-worker": "^2.0.1",
     "appdata-path": "^1.0.0",
     "babel-polyfill": "^6.26.0",
     "carlo": "^0.9.46",
