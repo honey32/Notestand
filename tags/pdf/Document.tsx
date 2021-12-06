@@ -1,8 +1,18 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { Document, Page } from "react-pdf/dist/umd/entry.parcel";
+import { Document, Page, pdfjs } from "react-pdf";
 import { DAO } from "../../scripts/dao/dao";
 import { run } from "../../scripts/util/lazy";
+
+const workerSrc = new URL(
+  "npm:react-pdf/node_modules/pdfjs-dist/build/pdf.worker.js",
+  import.meta.url
+);
+
+if (typeof window !== "undefined" && "Worker" in window) {
+  pdfjs.GlobalWorkerOptions.workerPort = new Worker(workerSrc);
+  pdfjs.GlobalWorkerOptions.workerSrc = workerSrc.toString();
+}
 
 interface DocProps {
   file: { data: Uint8Array };
