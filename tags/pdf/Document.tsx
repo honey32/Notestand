@@ -4,14 +4,16 @@ import { Document, Page } from "react-pdf";
 import { DAO } from "../../scripts/dao/dao";
 import { run } from "../../scripts/util/lazy";
 
-import * as pdfjs from "pdfjs-dist/legacy/build/pdf";
+import { pdfjs } from "react-pdf";
 
-// react-pdf で parcel v2 に対応していないので
+const workerSrc = new URL(
+  "npm:react-pdf/node_modules/pdfjs-dist/build/pdf.worker.js",
+  import.meta.url
+);
+
 if (typeof window !== "undefined" && "Worker" in window) {
-  pdfjs.GlobalWorkerOptions.workerPort = new Worker(
-    new URL("~/node_modules/react-pdf/dist/esm/pdf.worker.entry.js", import.meta.url),
-    { type: "module" }
-  );
+  pdfjs.GlobalWorkerOptions.workerPort = new Worker(workerSrc);
+  pdfjs.GlobalWorkerOptions.workerSrc = workerSrc.toString();
 }
 
 interface DocProps {
