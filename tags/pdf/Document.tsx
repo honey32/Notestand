@@ -1,10 +1,8 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { Document, Page } from "react-pdf";
+import { Document, Page, pdfjs } from "react-pdf";
 import { DAO } from "../../scripts/dao/dao";
 import { run } from "../../scripts/util/lazy";
-
-import { pdfjs } from "react-pdf";
 
 const workerSrc = new URL(
   "npm:react-pdf/node_modules/pdfjs-dist/build/pdf.worker.js",
