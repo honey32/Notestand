@@ -3,6 +3,6 @@ export class Tune {
 
   static createFromFile(file: { name: string; id: string }) {
     const result = /(.*)\.[^.]*$/.exec(file.name);
-    return new Tune(result[1] || file.name, file.id);
+    return new Tune(result?.[1] || file.name, file.id);
   }
 }
