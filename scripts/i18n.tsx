@@ -74,44 +74,54 @@ const zh_s: MessageAsset = {
   },
 };
 
-const LocaleContext = React.createContext<{
-  locale: string;
-  setLocale: (s: string) => void;
-}>(undefined);
+const LocaleReadContext = React.createContext<string | undefined>(undefined);
+const LocaleWriteContext = React.createContext<(s: string) => void>((s) => {
+  localStorage.setItem("locale", s);
+});
 
-export function useLocale() {
-  const { locale } = useContext(LocaleContext);
-  const asset: MessageAsset = {
-    ja: ja,
-    "ch-CN": zh_s,
-  }[locale] ?? en;
+export function useLocale(): [MessageAsset, string] {
+  const locale = useContext(LocaleReadContext);
+  if (locale === undefined) return [en, "en"] as const;
+  const asset: MessageAsset =
+    {
+      ja: ja,
+      "ch-CN": zh_s,
+    }[locale] ?? en;
   return [asset, locale] as const;
 }
 
 export const LocaleContextProvider: React.FC = ({ children }) => {
   const [locale, setLocale] = useState("en");
   useEffect(() => {
-    const l = localStorage.getItem("locale");
+    try {
+      const l = localStorage.getItem("locale");
+      if (!l) return;
 
-    if (!l) {
-      try {
-        localStorage.setItem("locale", l);
-      } catch (e) {}
-      console.log(locale);
-    }
-    setLocale(l);
+      setLocale(l);
+    } catch (e) {}
   }, []);
+
   useEffect(() => {
     document.body.setAttribute("lang", locale);
   }, [locale]);
+
   return (
-    <LocaleContext.Provider value={{ locale, setLocale }}>
-      {children}
-    </LocaleContext.Provider>
+    <LocaleWriteContext.Provider
+      value={(s) => {
+        try {
+          localStorage.setItem("locale", s);
+        } catch (e) {}
+        setLocale(s);
+      }}
+    >
+      <LocaleReadContext.Provider value={locale}>
+        {children}
+      </LocaleReadContext.Provider>
+    </LocaleWriteContext.Provider>
   );
 };
 
 export function useSetLocale() {
-  const a = useContext(LocaleContext);
-  return { setCurrentLocale: (s: string) => a.setLocale(s) };
+  const setLocale = useContext(LocaleWriteContext);
+  return { setCurrentLocale: setLocale };
 }
